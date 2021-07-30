@@ -23,5 +23,7 @@ data class UserModel(
     @Column(name = "is_viber")
     var isViber : Boolean = false,
     @Column(name = "uuid")
-    var uuid : String = UUID.randomUUID().toString()
+    var uuid : String = UUID.randomUUID().toString(),
+    @Column(name = "language")
+    var language : String = "ru",
 )

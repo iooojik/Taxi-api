@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.socket.messaging.SessionConnectedEvent
 import org.springframework.web.socket.messaging.SessionDisconnectEvent
 import org.jboss.logging.Logger
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 
 
 @Component
@@ -22,6 +23,11 @@ class WebSocketEventListener(val messagingTemplate: SimpMessageSendingOperations
 
     @EventListener
     fun handleWebSocketDisconnectListener(event: SessionDisconnectEvent) {
-        logger.info("Somebody has disconnected ${event.toString()}")
+        val headerAccessor = StompHeaderAccessor.wrap(event.message)
+        val username = headerAccessor.sessionAttributes!!["username"] as String?
+        if (username != null) {
+            logger.info("User Disconnected : $username")
+            messagingTemplate.convertAndSend("/topic/public", event)
+        }
     }
 }
