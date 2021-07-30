@@ -11,9 +11,9 @@ data class UserModel(
     @Column(name = "_id")
     var id: Long = -1,
     @Column(name = "user_name")
-    var userName : String = "",
+    var userName : String = "test",
     @Column(name = "user_phone")
-    var phone : String = "",
+    var phone : String = "test",
     @Column(name = "user_type")
     var type : String = "client",
     @Column(name = "token")

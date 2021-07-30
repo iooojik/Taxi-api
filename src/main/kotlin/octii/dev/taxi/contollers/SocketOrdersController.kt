@@ -64,6 +64,7 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
                         "/topic/${foundDriver.driver.uuid}",
                         ResponseModel(MessageType.ORDER_REQUEST, order)
                     )
+                    logger.info(order)
                 } else {
                     simpMessagingTemplate.convertAndSend(
                         "/topic/${customer.uuid}", ResponseModel(MessageType.NO_ORDERS, order)
