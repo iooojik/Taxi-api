@@ -22,4 +22,6 @@ data class UserModel(
     var isWhatsapp : Boolean = false,
     @Column(name = "is_viber")
     var isViber : Boolean = false,
+    @Column(name = "uuid")
+    var uuid : String = UUID.randomUUID().toString()
 )
