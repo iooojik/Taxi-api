@@ -11,10 +11,6 @@ data class DriverAvailable(
     var id: Long = -1,
     @Column(name = "driver_id")
     var driverID : Long = (-1).toLong(),
-    @Column(name = "latitude")
-    var latitude : String = "",
-    @Column(name = "longitude")
-    var longitude : String = "",
     @Column(name = "ride_distance")
     var rideDistance : Int = 15,
     @Column(name = "price_per_minute")
@@ -25,6 +21,6 @@ data class DriverAvailable(
     var priceWaitingMin : Int = 1,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "_id", referencedColumnName = "driver_id")
-    var driver : UserModel? = null
+    var driver : UserModel
 
 )

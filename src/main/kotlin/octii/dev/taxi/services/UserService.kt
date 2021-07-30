@@ -35,4 +35,6 @@ class UserService(private val userRepository: UserRepository) {
             userRepository.save(foundUser)
         } else userRepository.save(user)
     }
+
+    fun getByPhoneNumber(phone : String) : UserModel? = userRepository.findByPhone(phone)
 }

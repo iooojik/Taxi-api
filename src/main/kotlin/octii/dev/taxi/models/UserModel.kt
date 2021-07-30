@@ -26,4 +26,8 @@ data class UserModel(
     var uuid : String = UUID.randomUUID().toString(),
     @Column(name = "language")
     var language : String = "ru",
+    @Column(name = "latitude")
+    var latitude : Double = 0.0,
+    @Column(name = "longitude")
+    var longitude : Double = 0.0,
 )

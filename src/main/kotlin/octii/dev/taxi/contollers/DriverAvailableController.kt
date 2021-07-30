@@ -1,12 +1,17 @@
 package octii.dev.taxi.contollers
 
 import octii.dev.taxi.ResponseGenerator
+import octii.dev.taxi.models.DriverAvailable
 import octii.dev.taxi.models.UserModel
 import octii.dev.taxi.services.DriverAvailableService
 import octii.dev.taxi.services.UserService
+import org.springframework.data.repository.query.Param
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import kotlin.math.acos
+import kotlin.math.cos
+import kotlin.math.sin
 
 @RestController
 @Controller
