@@ -9,4 +9,7 @@ interface UserRepository : JpaRepository<UserModel, Long> {
     fun findByPhone(phone : String) : UserModel?
 
     fun findByToken(token : String) : UserModel?
+
+    fun findByUuid(uuid : String) : UserModel?
+
 }

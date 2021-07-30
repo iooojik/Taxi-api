@@ -9,7 +9,7 @@ data class DriverAvailable(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "_id")
     var id: Long = -1,
-    @Column(name = "driver_id")
+    @Column(name = "driver_id", insertable = false, updatable = false)
     var driverID : Long = (-1).toLong(),
     @Column(name = "ride_distance")
     var rideDistance : Int = 15,
@@ -19,8 +19,10 @@ data class DriverAvailable(
     var pricePerKm : Int = 10,
     @Column(name = "price_waiting_min")
     var priceWaitingMin : Int = 1,
+    @Column(name = "is_working")
+    var isWorking : Boolean = false,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "_id", referencedColumnName = "driver_id")
+    @JoinColumn(name = "driver_id", referencedColumnName = "_id")
     var driver : UserModel
 
 )

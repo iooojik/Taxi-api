@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service
 
 @Service
 class DriverAvailableService(val driverAvailableRepository: DriverAvailableRepository) {
-    fun getAll() : List<DriverAvailable> = driverAvailableRepository.findAll()
+    fun getAll() : List<DriverAvailable> = driverAvailableRepository.findAllByIsWorking()
 }

@@ -1,5 +1,6 @@
 package octii.dev.taxi.contollers
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import octii.dev.taxi.listeners.WebSocketEventListener
 import octii.dev.taxi.models.*
 import octii.dev.taxi.services.DriverAvailableService
@@ -25,23 +26,19 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
 
     val logger = WebSocketEventListener.logger
 
-    @MessageMapping("/authorization.{uuid}")
-    fun authorization(@Payload userModel: UserModel, @DestinationVariable("uuid") uuid : String) : UserModel{
-        val model = userService.registerUser(user = userModel)
-        logger.info("$model $userModel")
-        simpMessagingTemplate.convertAndSend("/topic/$uuid", ResponseModel(MessageType.AUTHORIZATION, model))
-        return model ?: UserModel()
-    }
-
     @MessageMapping("/order.make.{uuid}")//пользователь создал заказ
-    fun makeOrder(@Payload c: UserModel, @DestinationVariable("uuid") customerUUID : String,
-                  isNew : Boolean = false, orderModel: OrdersModel? = null){
+    fun makeOrder(//isNew : Boolean = false, orderModel: OrdersModel? = null,
+        orderModel: OrdersModel = OrdersModel(),
+        @Payload c : UserModel, @DestinationVariable("uuid") customerUUID : String){
+
         //ищем пользователя в таблице
         val customer = userService.getByPhoneNumber(c.phone)
+
+        //val customer = userService.getByUserUUID(customerUUID)
         if (customer != null) {
             var order : OrdersModel? = null
             //если метод вызывается не повторно после отказа водителя, то создаём новый заказ, иначе ищем в списке заказов
-            if (isNew) {
+            if (orderModel.isNew) {
                 //создаём заказ в таблице orders
                 order = ordersService.registerNewOrder(
                     OrdersModel(
@@ -49,24 +46,33 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
                         uuid = UUID.randomUUID().toString(), customer = customer
                     )
                 )
-            } else if (orderModel != null){
+            } else if (orderModel.uuid.isNotEmpty()){
                 order = ordersService.getByOrderUUID(orderModel.uuid)
             }
 
             if (order != null) {
                 val orderUUID = order.uuid
-                //получени подходящего водителя
+                //получение подходящего водителя
                 val foundDriver = getNearestDriver(customer, orderUUID)
-                //обновляем информацию о заказе
-                order.driverID = foundDriver.driverID
-                order = ordersService.updateInfo(order)
-                //отправляем найденному водителю предложение о заказе
-                simpMessagingTemplate.convertAndSend(
-                    "/topic/${foundDriver.driver.uuid}",
-                    ResponseModel(MessageType.ORDER_REQUEST, order)
-                )
+                if (foundDriver != null) {
+                    //обновляем информацию о заказе
+                    order.driverID = foundDriver.driverID
+                    order = ordersService.updateInfo(order)
+                    //отправляем найденному водителю предложение о заказе
+                    logger.info(foundDriver.driver.uuid)
+                    simpMessagingTemplate.convertAndSend(
+                        "/topic/${foundDriver.driver.uuid}",
+                        ResponseModel(MessageType.ORDER_REQUEST, order)
+                    )
+                } else {
+                    simpMessagingTemplate.convertAndSend(
+                        "/topic/${customer.uuid}", ResponseModel(MessageType.NO_ORDERS, order)
+                    )
+                }
             }
         }
+
+
     }
 
     @MessageMapping("/order.accept.{uuid}") //водитель принял заказ
@@ -74,7 +80,7 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
         val order = ordersService.getByOrderUUID(orderModel.uuid)
         if (order != null) {
             simpMessagingTemplate.convertAndSend(
-                "/topic/${orderModel.customer.uuid}",
+                "/topic/${orderModel.customer!!.uuid}",
                 ResponseModel(MessageType.ORDER_ACCEPT, order)
             )
             simpMessagingTemplate.convertAndSend(
@@ -89,7 +95,9 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
         val order = ordersService.getByOrderUUID(orderModel.uuid)
         if (order != null) {
             rejectedOrdersService.reject(RejectedOrdersModel(driverID = order.driverID, orderUuid = order.uuid))
-            makeOrder(order.customer, order.uuid, true, order)
+            order.isNew = false
+            ordersService.updateInfo(order)
+            makeOrder(order, order.customer!!, order.customer!!.uuid)
         }
     }
 
@@ -105,15 +113,16 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
                 ResponseModel(MessageType.ORDER_FINISHED, order)
             )
             simpMessagingTemplate.convertAndSend(
-                "/topic/${orderModel.customer.uuid}",
+                "/topic/${orderModel.customer!!.uuid}",
                 ResponseModel(MessageType.ORDER_FINISHED, order)
             )
         }
     }
 
-    private fun getNearestDriver(customer : UserModel, orderUUID: String) : DriverAvailable{
+    private fun getNearestDriver(customer : UserModel, orderUUID: String) : DriverAvailable? {
         //получаем список доступных водителей
         val availableDrivers = driverAvailableService.getAll()
+        logger.info(availableDrivers)
         //получаем список водителей, которые отказались от выполнения заказа
         val rejectedOrders = rejectedOrdersService.getByOrderUUID(orderUUID)
         //подходящие водители
@@ -131,10 +140,13 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
                 //рассчитываем дистанцию между клиентом и водителем
                 val distance = calcDistance(customer.latitude, customer.longitude, driver.latitude, driver.longitude)
                 if (distance <= driverAv.rideDistance) map[distance] = driverAv
+                logger.info(distance)
             }
 
         }
-        //ищем подходяещего водителя, сортируя сначала по дистанции, а потом по цене за минуту
+        logger.info(map)
+
+        //ищем подходящего водителя, сортируя сначала по дистанции, а потом по цене за минуту
         val comparator = compareBy<Pair<Double, DriverAvailable>>{it.first}
             .thenComparator { a: Pair<Double, DriverAvailable>, b: Pair<Double, DriverAvailable> ->
                 compareValues(
@@ -142,9 +154,14 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
                     b.second.pricePerMinute
                 )
             }
-        //получаем первое значение и это и есть подходящий водитель
+        //получаем первое значение - это и есть подходящий водитель
         val list = map.toList().sortedWith(comparator)
-        return list[0].second
+        logger.info(list)
+        return if (list.isNotEmpty())
+            list[0].second
+        else {
+            null
+        }
     }
 
     private fun calcDistance(lat1 : Double, lon1 : Double, lat2 : Double, lon2 : Double): Double {

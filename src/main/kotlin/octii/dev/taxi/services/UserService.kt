@@ -37,4 +37,6 @@ class UserService(private val userRepository: UserRepository) {
     }
 
     fun getByPhoneNumber(phone : String) : UserModel? = userRepository.findByPhone(phone)
+
+    fun getByUserUUID(uuid : String) : UserModel? = userRepository.findByUuid(uuid)
 }

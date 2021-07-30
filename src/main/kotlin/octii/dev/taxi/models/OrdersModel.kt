@@ -23,5 +23,6 @@ data class OrdersModel(
     var driver : UserModel? = null,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "_id", referencedColumnName = "customer_id")
-    var customer : UserModel,
+    var customer : UserModel? = null,
+    var isNew : Boolean = true
 )
