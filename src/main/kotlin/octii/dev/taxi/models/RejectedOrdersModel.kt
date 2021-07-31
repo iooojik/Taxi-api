@@ -1,5 +1,6 @@
 package octii.dev.taxi.models
 
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -9,8 +10,8 @@ data class RejectedOrdersModel(
     @GeneratedValue
     @Column(name = "_id")
     var id: Long = -1,
-    @Column(name = "driver_id")
-    var driverID : Long = (-1).toLong(),
+    @Column(name = "driver_uuid")
+    var driverUUID : String = UUID.randomUUID().toString(),
     @Column(name = "order_uuid")
     var orderUuid : String
 )

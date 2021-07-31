@@ -11,7 +11,7 @@ data class OrdersModel(
     @Column(name = "_id")
     var id: Long = -1,
     @Column(name = "driver_id", insertable = false, updatable = false)
-    var driverID : Long = (-1).toLong(),
+    var driverID : Long? = (-1).toLong(),
     @Column(name = "customer_id", insertable = false, updatable = false)
     var customerID : Long = (-1).toLong(),
     @Column(name = "uuid")

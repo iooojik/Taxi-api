@@ -1,7 +1,10 @@
 package octii.dev.taxi.contollers
 
 import octii.dev.taxi.ResponseGenerator
+import octii.dev.taxi.models.OrdersModel
+import octii.dev.taxi.models.TokenAuthorization
 import octii.dev.taxi.models.UserModel
+import octii.dev.taxi.services.OrdersService
 import octii.dev.taxi.services.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -14,7 +17,7 @@ import java.util.*
 @RestController
 @Controller
 @RequestMapping("/users/")
-class UsersController(private val userService: UserService) : ResponseGenerator {
+class UsersController(private val userService: UserService, private val ordersService: OrdersService) : ResponseGenerator {
 
     @GetMapping("/")
     fun getUsers() : ResponseEntity<Any> = okResponse(userService.getAllUsers())
@@ -30,8 +33,15 @@ class UsersController(private val userService: UserService) : ResponseGenerator 
     }
 
     @PostMapping("/login.token")
-    fun loginWithToken(@RequestBody user : UserModel) : UserModel{
-        return userService.loginWithToken(user)
+    fun loginWithToken(@RequestBody user : UserModel) : ResponseEntity<Any>{
+        val userModel = userService.loginWithToken(user)
+        var orderModel : OrdersModel? = null
+        orderModel = if (userModel.type == "driver")
+            ordersService.getByDriverID(userModel.id)
+        else ordersService.getByCustomerID(userModel.id)
+        val tokenAuthorization = TokenAuthorization(userModel, orderModel)
+        println(tokenAuthorization)
+        return okResponse(tokenAuthorization)
     }
 
 }

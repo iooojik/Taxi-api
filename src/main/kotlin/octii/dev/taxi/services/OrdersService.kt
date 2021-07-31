@@ -16,4 +16,8 @@ class OrdersService(val ordersRepository: OrdersRepository) {
     fun updateInfo(orderModel: OrdersModel) : OrdersModel = ordersRepository.save(orderModel)
 
     fun getByOrderUUID(uuid : String) : OrdersModel? = ordersRepository.getByUuid(uuid)
+
+    fun getByDriverID(id : Long) : OrdersModel? = ordersRepository.getAllByDriverID(id).last()
+
+    fun getByCustomerID(id : Long) : OrdersModel? = ordersRepository.getAllByCustomerID(id).last()
 }

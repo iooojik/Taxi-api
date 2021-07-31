@@ -79,7 +79,12 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
     @MessageMapping("/order.accept.{uuid}") //водитель принял заказ
     fun acceptOrder(@Payload orderModel: OrdersModel, @DestinationVariable("uuid") driverUUID : String){
         val order = ordersService.getByOrderUUID(orderModel.uuid)
+
         if (order != null) {
+            val driver = userService.getByUserUUID(driverUUID)
+            order.driverID = driver?.id
+            order.driver = driver
+            ordersService.updateInfo(order)
             simpMessagingTemplate.convertAndSend(
                 "/topic/${orderModel.customer!!.uuid}",
                 ResponseModel(MessageType.ORDER_ACCEPT, order)
@@ -95,7 +100,7 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
     fun rejectOrder(@Payload orderModel: OrdersModel, @DestinationVariable("uuid") driverUUID : String){
         val order = ordersService.getByOrderUUID(orderModel.uuid)
         if (order != null) {
-            rejectedOrdersService.reject(RejectedOrdersModel(driverID = order.driverID, orderUuid = order.uuid))
+            rejectedOrdersService.reject(RejectedOrdersModel(driverUUID = driverUUID, orderUuid = order.uuid))
             order.isNew = false
             ordersService.updateInfo(order)
             makeOrder(order, order.customer!!, order.customer!!.uuid)
@@ -123,7 +128,7 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
     private fun getNearestDriver(customer : UserModel, orderUUID: String) : DriverAvailable? {
         //получаем список доступных водителей
         val availableDrivers = driverAvailableService.getAll()
-        logger.info(availableDrivers)
+        logger.info("available: $availableDrivers")
         //получаем список водителей, которые отказались от выполнения заказа
         val rejectedOrders = rejectedOrdersService.getByOrderUUID(orderUUID)
         //подходящие водители
@@ -134,18 +139,18 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
             //проверяем, отказал ли водитель в выполнении заказа
             var wasFoundRejected = false
             for (order in rejectedOrders){
-                if (driverAv.id == order.driverID) wasFoundRejected = true
+                if (driver.uuid == order.driverUUID) wasFoundRejected = true
             }
             //если не отказал, то проверяем расстояние между клиентом и водителем
             if (!wasFoundRejected){
                 //рассчитываем дистанцию между клиентом и водителем
                 val distance = calcDistance(customer.latitude, customer.longitude, driver.latitude, driver.longitude)
                 if (distance <= driverAv.rideDistance) map[distance] = driverAv
-                logger.info(distance)
+                logger.info("distance: $distance")
             }
 
         }
-        logger.info(map)
+        logger.info("found: $map")
 
         //ищем подходящего водителя, сортируя сначала по дистанции, а потом по цене за минуту
         val comparator = compareBy<Pair<Double, DriverAvailable>>{it.first}

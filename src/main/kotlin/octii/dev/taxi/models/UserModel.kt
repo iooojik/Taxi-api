@@ -11,9 +11,9 @@ data class UserModel(
     @Column(name = "_id")
     var id: Long = -1,
     @Column(name = "user_name")
-    var userName : String = "test",
+    var userName : String = "",
     @Column(name = "user_phone")
-    var phone : String = "test",
+    var phone : String = "",
     @Column(name = "user_type")
     var type : String = "client",
     @Column(name = "token")
@@ -30,4 +30,6 @@ data class UserModel(
     var latitude : Double = 0.0,
     @Column(name = "longitude")
     var longitude : Double = 0.0,
+    @Column(name = "is_only_client")
+    var isOnlyClient : Boolean = type == "client"
 )
