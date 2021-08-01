@@ -23,13 +23,27 @@ class UsersController(private val userService: UserService, private val ordersSe
     fun getUsers() : ResponseEntity<Any> = okResponse(userService.getAllUsers())
 
     @PostMapping("/registration")
-    fun registration(@RequestBody userModel: UserModel) : UserModel {
-        return userService.registerUser(userModel)
+    fun registration(@RequestBody userModel: UserModel) : ResponseEntity<Any> {
+        return okResponse(userService.registerUser(userModel))
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody user : UserModel) : UserModel{
-        return userService.login(user)
+    fun login(@RequestBody user : UserModel) : ResponseEntity<Any>{
+        return okResponse(userService.login(user))
+    }
+
+    @PostMapping("/update")
+    fun update(@RequestBody user : UserModel) : ResponseEntity<Any>{
+        val userModel = userService.getByUserUUID(user.uuid)
+        return if (userModel != null){
+            userModel.isViber = user.isViber
+            userModel.isWhatsapp = user.isWhatsapp
+            userModel.type = user.type
+            userModel.languages = user.languages
+            //userModel.language = user.language
+            okResponse(userService.update(userModel))
+        } else errorResponse()
+
     }
 
     @PostMapping("/login.token")

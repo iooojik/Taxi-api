@@ -1,12 +1,8 @@
 package octii.dev.taxi.contollers
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import octii.dev.taxi.listeners.WebSocketEventListener
 import octii.dev.taxi.models.*
-import octii.dev.taxi.services.DriverAvailableService
-import octii.dev.taxi.services.OrdersService
-import octii.dev.taxi.services.RejectedOrdersService
-import octii.dev.taxi.services.UserService
+import octii.dev.taxi.services.*
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
@@ -20,9 +16,10 @@ import kotlin.math.sin
 
 
 @Controller
-class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
-                             val userService: UserService, val driverAvailableService: DriverAvailableService,
-                             val ordersService: OrdersService, val rejectedOrdersService: RejectedOrdersService) {
+class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
+                       val userService: UserService, val driverAvailableService: DriverAvailableService,
+                       val ordersService: OrdersService, val rejectedOrdersService: RejectedOrdersService,
+                       val coordinateService: CoordinateService) {
 
     val logger = WebSocketEventListener.logger
 
@@ -57,7 +54,7 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
                 if (foundDriver != null) {
                     //обновляем информацию о заказе
                     order.driverID = foundDriver.driverID
-                    order = ordersService.updateInfo(order)
+                    order = ordersService.update(order)
                     //отправляем найденному водителю предложение о заказе
                     logger.info(foundDriver.driver.uuid)
                     simpMessagingTemplate.convertAndSend(
@@ -84,7 +81,7 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
             val driver = userService.getByUserUUID(driverUUID)
             order.driverID = driver?.id
             order.driver = driver
-            ordersService.updateInfo(order)
+            ordersService.update(order)
             simpMessagingTemplate.convertAndSend(
                 "/topic/${orderModel.customer!!.uuid}",
                 ResponseModel(MessageType.ORDER_ACCEPT, order)
@@ -102,7 +99,7 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
         if (order != null) {
             rejectedOrdersService.reject(RejectedOrdersModel(driverUUID = driverUUID, orderUuid = order.uuid))
             order.isNew = false
-            ordersService.updateInfo(order)
+            ordersService.update(order)
             makeOrder(order, order.customer!!, order.customer!!.uuid)
         }
     }
@@ -112,7 +109,7 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
         val order = ordersService.getByOrderUUID(orderModel.uuid)
         if (order != null) {
             order.isFinished = true
-            ordersService.updateInfo(order)
+            ordersService.update(order)
             
             simpMessagingTemplate.convertAndSend(
                 "/topic/${orderModel.driver!!.uuid}",
@@ -125,14 +122,27 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
         }
     }
 
-    private fun getNearestDriver(customer : UserModel, orderUUID: String) : DriverAvailable? {
+    @MessageMapping("/navigation.coordinates.update.{uuid}")
+    fun updateCoordinates(@Payload coordinates : CoordinatesModel, @DestinationVariable("uuid") userUUID : String){
+        val user = userService.getByUserUUID(userUUID)
+        if (user != null){
+            coordinates.userId = user.id
+            coordinateService.update(coordinates, user.id)
+        }
+        simpMessagingTemplate.convertAndSend(
+            "/topic/$userUUID",
+            ResponseModel(MessageType.ORDER_FINISHED, user)
+        )
+    }
+
+    private fun getNearestDriver(customer : UserModel, orderUUID: String) : DriverAvailableModel? {
         //получаем список доступных водителей
         val availableDrivers = driverAvailableService.getAll()
         logger.info("available: $availableDrivers")
         //получаем список водителей, которые отказались от выполнения заказа
         val rejectedOrders = rejectedOrdersService.getByOrderUUID(orderUUID)
         //подходящие водители
-        val map : HashMap<Double, DriverAvailable> = hashMapOf()
+        val map : HashMap<Double, DriverAvailableModel> = hashMapOf()
 
         for (driverAv in availableDrivers){
             val driver = driverAv.driver
@@ -144,7 +154,8 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
             //если не отказал, то проверяем расстояние между клиентом и водителем
             if (!wasFoundRejected){
                 //рассчитываем дистанцию между клиентом и водителем
-                val distance = calcDistance(customer.latitude, customer.longitude, driver.latitude, driver.longitude)
+                val distance = calcDistance(customer.coordinates.latitude, customer.coordinates.longitude,
+                    driver.coordinates.latitude, driver.coordinates.longitude)
                 if (distance <= driverAv.rideDistance) map[distance] = driverAv
                 logger.info("distance: $distance")
             }
@@ -153,8 +164,8 @@ class SocketOrdersController(val simpMessagingTemplate : SimpMessagingTemplate,
         logger.info("found: $map")
 
         //ищем подходящего водителя, сортируя сначала по дистанции, а потом по цене за минуту
-        val comparator = compareBy<Pair<Double, DriverAvailable>>{it.first}
-            .thenComparator { a: Pair<Double, DriverAvailable>, b: Pair<Double, DriverAvailable> ->
+        val comparator = compareBy<Pair<Double, DriverAvailableModel>>{it.first}
+            .thenComparator { a: Pair<Double, DriverAvailableModel>, b: Pair<Double, DriverAvailableModel> ->
                 compareValues(
                     a.first,
                     b.second.pricePerMinute

@@ -22,14 +22,16 @@ data class UserModel(
     var isWhatsapp : Boolean = false,
     @Column(name = "is_viber")
     var isViber : Boolean = false,
-    @Column(name = "uuid")
+    @Column(name = "uuid", insertable = false, updatable = false)
     var uuid : String = UUID.randomUUID().toString(),
-    @Column(name = "language")
-    var language : String = "ru",
-    @Column(name = "latitude")
-    var latitude : Double = 0.0,
-    @Column(name = "longitude")
-    var longitude : Double = 0.0,
     @Column(name = "is_only_client")
-    var isOnlyClient : Boolean = type == "client"
+    var isOnlyClient : Boolean = type == "client",
+    @Column(name = "avatar_url")
+    var avatarURL : String? = "",
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "driver_id")
+    var languages : List<SpeakingLanguagesModel> = listOf(),
+    @OneToOne(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "_id", referencedColumnName = "user_id")
+    var coordinates : CoordinatesModel = CoordinatesModel(),
 )
