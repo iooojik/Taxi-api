@@ -17,12 +17,13 @@ class UserService(private val userRepository: UserRepository,
     fun getAllUsers(): List<UserModel> = userRepository.findAll()
 
     fun registerUser(user : UserModel) : UserModel {
+        //сохраняем пользователя и получаем его стандартные данные
+        //сохраняем модель с координатами
         var savedUser = userRepository.save(user)
         savedUser.coordinates = coordinatesRepository.save(CoordinatesModel(user = savedUser))
-        userRepository.save(savedUser)
-        //savedUser.coordinates = CoordinatesModel(user = savedUser)
         if (savedUser.type == "driver")
             driverAvailableRepository.save(DriverAvailableModel(driver = user, driverID = user.id))
+        //обновляем данные пользователя
         savedUser = userRepository.save(savedUser)
         return savedUser
     }
@@ -37,6 +38,7 @@ class UserService(private val userRepository: UserRepository,
     }
 
     fun login(user: UserModel): UserModel {
+        //находим пользователя по номеру телефона
         val foundUser = userRepository.findByPhone(user.phone)
         if (foundUser != null){
             if (foundUser.type == "driver"){
@@ -50,11 +52,11 @@ class UserService(private val userRepository: UserRepository,
             foundUser.isWhatsapp = user.isWhatsapp
             foundUser.isViber = user.isViber
             foundUser.token = UUID.randomUUID().toString()
+            if (user.coordinates != null)
+                foundUser.coordinates = user.coordinates
             userRepository.save(foundUser)
         } else {
-            val u = userRepository.save(user)
-            u.coordinates = coordinatesRepository.save(CoordinatesModel(user = u))
-            userRepository.save(u)
+            registerUser(user)
         }
     }
 
@@ -63,7 +65,6 @@ class UserService(private val userRepository: UserRepository,
     fun getByUserUUID(uuid : String) : UserModel? = userRepository.findByUuid(uuid)
 
     fun update(user : UserModel) : UserModel {
-        //languageService.deleteAllLanguages(user.id)
         return userRepository.save(user)
     }
 }
