@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface LanguageRepository : JpaRepository<SpeakingLanguagesModel, Long>{
+    fun deleteAllByUserId(id : Long)
 }

@@ -2,6 +2,7 @@ package octii.dev.taxi.contollers
 
 import octii.dev.taxi.ResponseGenerator
 import octii.dev.taxi.models.OrdersModel
+import octii.dev.taxi.models.SpeakingLanguagesModel
 import octii.dev.taxi.models.TokenAuthorization
 import octii.dev.taxi.models.UserModel
 import octii.dev.taxi.services.OrdersService
@@ -39,7 +40,10 @@ class UsersController(private val userService: UserService, private val ordersSe
             userModel.isViber = user.isViber
             userModel.isWhatsapp = user.isWhatsapp
             userModel.type = user.type
-            userModel.languages = user.languages
+            println(user.languages)
+            if (user.languages.isEmpty())
+                userModel.languages = listOf(SpeakingLanguagesModel(userId = userModel.id, language = "sr"))
+            else userModel.languages = user.languages
             //userModel.language = user.language
             okResponse(userService.update(userModel))
         } else errorResponse()

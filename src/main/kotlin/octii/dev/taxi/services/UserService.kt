@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class UserService(private val userRepository: UserRepository, val driverAvailableRepository: DriverAvailableRepository) {
+class UserService(private val userRepository: UserRepository,
+                  val driverAvailableRepository: DriverAvailableRepository,
+                  val languageService: LanguageService) {
 
     fun getAllUsers(): List<UserModel> = userRepository.findAll()
 
@@ -54,5 +56,8 @@ class UserService(private val userRepository: UserRepository, val driverAvailabl
 
     fun getByUserUUID(uuid : String) : UserModel? = userRepository.findByUuid(uuid)
 
-    fun update(user : UserModel) : UserModel = userRepository.save(user)
+    fun update(user : UserModel) : UserModel {
+        //languageService.deleteAllLanguages(user.id)
+        return userRepository.save(user)
+    }
 }

@@ -29,7 +29,7 @@ data class UserModel(
     @Column(name = "avatar_url")
     var avatarURL : String? = "",
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "driver_id")
+    @JoinColumn(name = "user_id")
     var languages : List<SpeakingLanguagesModel> = listOf(),
     @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "_id", referencedColumnName = "user_id")
