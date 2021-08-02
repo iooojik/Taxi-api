@@ -126,12 +126,12 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
     fun updateCoordinates(@Payload coordinates : CoordinatesModel, @DestinationVariable("uuid") userUUID : String){
         val user = userService.getByUserUUID(userUUID)
         if (user != null){
-            coordinates.userId = user.id
+            //coordinates.userId = user.id
             coordinateService.update(coordinates, user.id)
         }
         simpMessagingTemplate.convertAndSend(
             "/topic/$userUUID",
-            ResponseModel(MessageType.ORDER_FINISHED, user)
+            ResponseModel(MessageType.COORDINATES_UPDATE, coordinates)
         )
     }
 
@@ -153,11 +153,17 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
             }
             //если не отказал, то проверяем расстояние между клиентом и водителем
             if (!wasFoundRejected){
-                //рассчитываем дистанцию между клиентом и водителем
-                val distance = calcDistance(customer.coordinates.latitude, customer.coordinates.longitude,
-                    driver.coordinates.latitude, driver.coordinates.longitude)
-                if (distance <= driverAv.rideDistance) map[distance] = driverAv
-                logger.info("distance: $distance")
+                val driverCoordinates = coordinateService.getByUserId(driver.id)
+                val customerCoordinates = coordinateService.getByUserId(customer.id)
+                if (driverCoordinates != null && customerCoordinates != null) {
+                    //рассчитываем дистанцию между клиентом и водителем
+                    val distance = calcDistance(
+                        customerCoordinates.latitude, customerCoordinates.longitude,
+                        driverCoordinates.latitude, driverCoordinates.longitude
+                    )
+                    if (distance <= driverAv.rideDistance) map[distance] = driverAv
+                    logger.info("distance: $distance")
+                }
             }
 
         }

@@ -1,5 +1,6 @@
 package octii.dev.taxi.models
 
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import java.util.*
 import javax.persistence.*
 
@@ -8,7 +9,7 @@ import javax.persistence.*
 data class UserModel(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "_id")
+    @Column(name = "_id", insertable = false, updatable = false)
     var id: Long = -1,
     @Column(name = "user_name")
     var userName : String = "",
@@ -22,7 +23,7 @@ data class UserModel(
     var isWhatsapp : Boolean = false,
     @Column(name = "is_viber")
     var isViber : Boolean = false,
-    @Column(name = "uuid", insertable = false, updatable = false)
+    @Column(name = "uuid")
     var uuid : String = UUID.randomUUID().toString(),
     @Column(name = "is_only_client")
     var isOnlyClient : Boolean = type == "client",
@@ -31,7 +32,7 @@ data class UserModel(
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "user_id")
     var languages : List<SpeakingLanguagesModel> = listOf(),
-    @OneToOne(cascade = [CascadeType.ALL])
-    @JoinColumn(name = "_id", referencedColumnName = "user_id")
-    var coordinates : CoordinatesModel = CoordinatesModel(),
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JsonManagedReference
+    var coordinates : CoordinatesModel? = null
 )

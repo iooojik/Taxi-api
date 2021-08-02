@@ -13,8 +13,10 @@ class CoordinateService(private val coordinatesRepository: CoordinatesRepository
             foundCoordinates.longitude = coordinatesModel.longitude
             coordinatesRepository.save(foundCoordinates)
         } else{
-            coordinatesModel.userId = userId
+            //coordinatesModel.userId = userId
             coordinatesRepository.save(coordinatesModel)
         }
     }
+
+    fun getByUserId(id : Long) : CoordinatesModel? = coordinatesRepository.findByUserId(id)
 }

@@ -23,6 +23,9 @@ class UsersController(private val userService: UserService, private val ordersSe
     @GetMapping("/")
     fun getUsers() : ResponseEntity<Any> = okResponse(userService.getAllUsers())
 
+    @GetMapping("/orders")
+    fun getOrders() : ResponseEntity<Any> = okResponse(ordersService.getAll())
+
     @PostMapping("/registration")
     fun registration(@RequestBody userModel: UserModel) : ResponseEntity<Any> {
         return okResponse(userService.registerUser(userModel))
@@ -53,13 +56,14 @@ class UsersController(private val userService: UserService, private val ordersSe
     @PostMapping("/login.token")
     fun loginWithToken(@RequestBody user : UserModel) : ResponseEntity<Any>{
         val userModel = userService.loginWithToken(user)
-        var orderModel : OrdersModel? = null
-        orderModel = if (userModel.type == "driver")
-            ordersService.getByDriverID(userModel.id)
-        else ordersService.getByCustomerID(userModel.id)
-        val tokenAuthorization = TokenAuthorization(userModel, orderModel)
-        println(tokenAuthorization)
-        return okResponse(tokenAuthorization)
+        return if (userModel != null) {
+            val orderModel: OrdersModel? = if (userModel.type == "driver")
+                ordersService.getByDriverID(userModel.id)
+            else ordersService.getByCustomerID(userModel.id)
+            val tokenAuthorization = TokenAuthorization(userModel, orderModel)
+            println(tokenAuthorization)
+            okResponse(tokenAuthorization)
+        }else errorResponse("Token error")
     }
 
 }

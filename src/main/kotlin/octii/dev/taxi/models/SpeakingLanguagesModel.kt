@@ -1,6 +1,5 @@
 package octii.dev.taxi.models
 
-import java.util.*
 import javax.persistence.*
 
 @Entity

@@ -1,7 +1,9 @@
 package octii.dev.taxi.services
 
+import octii.dev.taxi.models.CoordinatesModel
 import octii.dev.taxi.models.DriverAvailableModel
 import octii.dev.taxi.models.UserModel
+import octii.dev.taxi.repositories.CoordinatesRepository
 import octii.dev.taxi.repositories.DriverAvailableRepository
 import octii.dev.taxi.repositories.UserRepository
 import org.springframework.stereotype.Service
@@ -10,28 +12,28 @@ import java.util.*
 @Service
 class UserService(private val userRepository: UserRepository,
                   val driverAvailableRepository: DriverAvailableRepository,
-                  val languageService: LanguageService) {
+                  val languageService: LanguageService, val coordinatesRepository: CoordinatesRepository) {
 
     fun getAllUsers(): List<UserModel> = userRepository.findAll()
 
     fun registerUser(user : UserModel) : UserModel {
-        val savedUser = userRepository.save(user)
+        var savedUser = userRepository.save(user)
+        savedUser.coordinates = coordinatesRepository.save(CoordinatesModel(user = savedUser))
+        userRepository.save(savedUser)
+        //savedUser.coordinates = CoordinatesModel(user = savedUser)
         if (savedUser.type == "driver")
             driverAvailableRepository.save(DriverAvailableModel(driver = user, driverID = user.id))
-
+        savedUser = userRepository.save(savedUser)
         return savedUser
     }
 
-    fun loginWithToken(user: UserModel) : UserModel{
+    fun loginWithToken(user: UserModel) : UserModel?{
         val foundUser = userRepository.findByToken(user.token)
-        return if (foundUser != null){
+        if (foundUser != null){
             foundUser.token = UUID.randomUUID().toString()
             userRepository.save(foundUser)
-        } else {
-            val md = UserModel()
-            md.token = ""
-            return md
         }
+        return null
     }
 
     fun login(user: UserModel): UserModel {
@@ -49,7 +51,11 @@ class UserService(private val userRepository: UserRepository,
             foundUser.isViber = user.isViber
             foundUser.token = UUID.randomUUID().toString()
             userRepository.save(foundUser)
-        } else userRepository.save(user)
+        } else {
+            val u = userRepository.save(user)
+            u.coordinates = coordinatesRepository.save(CoordinatesModel(user = u))
+            userRepository.save(u)
+        }
     }
 
     fun getByPhoneNumber(phone : String) : UserModel? = userRepository.findByPhone(phone)
