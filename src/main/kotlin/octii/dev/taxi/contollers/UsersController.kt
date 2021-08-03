@@ -71,7 +71,13 @@ class UsersController(private val userService: UserService,
             userModel.driver?.pricePerKm = user.driver?.pricePerKm!!
             userModel.driver?.pricePerMinute = user.driver?.pricePerMinute!!
             userModel.driver?.priceWaitingMin = user.driver?.priceWaitingMin!!
-
+            languageService.deleteAllLanguages(userModel.id)
+            user.languages.forEach {
+                val savedLang = languageService.save(SpeakingLanguagesModel(language = it.language))
+                savedLang.user = userModel
+                languageService.save(savedLang)
+            }
+            /*
             user.languages.forEach { lang ->
                 val l = lang.language
                 println(l)
@@ -89,6 +95,8 @@ class UsersController(private val userService: UserService,
                 }
                 found = false
             }
+
+             */
             //userModel.languages = user.languages
             //userModel.driver = user.driver
             okResponse(userService.update(userModel))
