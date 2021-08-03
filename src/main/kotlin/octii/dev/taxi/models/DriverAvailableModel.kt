@@ -1,16 +1,15 @@
 package octii.dev.taxi.models
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
 @Table(name = "drivers_available")
-data class DriverAvailableModel(
+class DriverAvailableModel(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "_id")
     var id: Long = -1,
-    @Column(name = "driver_id", insertable = false, updatable = false)
-    var driverID : Long = (-1).toLong(),
     @Column(name = "ride_distance")
     var rideDistance : Float = 15f,
     @Column(name = "price_per_minute")
@@ -21,8 +20,14 @@ data class DriverAvailableModel(
     var priceWaitingMin : Float = 1f,
     @Column(name = "is_working")
     var isWorking : Boolean = false,
-    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "driver_id", referencedColumnName = "_id")
-    var driver : UserModel
-
-)
+    @OneToOne(optional = false)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    var driver : UserModel? = null
+) {
+    override fun toString(): String {
+        return "{\"id\": ${this.id},\"rideDistance\": ${this.rideDistance}," +
+                "\"pricePerMinute\": ${this.pricePerMinute},\"pricePerKm\": ${this.pricePerKm}," +
+                "\"priceWaitingMin\": ${this.priceWaitingMin},\"isWorking\": ${this.isWorking} }"
+    }
+}

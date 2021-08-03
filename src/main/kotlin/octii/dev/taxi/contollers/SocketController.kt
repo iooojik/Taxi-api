@@ -51,14 +51,14 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
                 val orderUUID = order.uuid
                 //получение подходящего водителя
                 val foundDriver = getNearestDriver(customer, orderUUID)
-                if (foundDriver != null) {
+                if (foundDriver?.driver != null) {
                     //обновляем информацию о заказе
-                    order.driverID = foundDriver.driverID
+                    order.driverID = foundDriver.driver!!.id
                     order = ordersService.update(order)
                     //отправляем найденному водителю предложение о заказе
-                    logger.info(foundDriver.driver.uuid)
+                    logger.info(foundDriver.driver!!.uuid)
                     simpMessagingTemplate.convertAndSend(
-                        "/topic/${foundDriver.driver.uuid}",
+                        "/topic/${foundDriver.driver!!.uuid}",
                         ResponseModel(MessageType.ORDER_REQUEST, order)
                     )
                     logger.info(order)
@@ -149,10 +149,10 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
             //проверяем, отказал ли водитель в выполнении заказа
             var wasFoundRejected = false
             for (order in rejectedOrders){
-                if (driver.uuid == order.driverUUID) wasFoundRejected = true
+                if (driver?.uuid == order.driverUUID) wasFoundRejected = true
             }
             //если не отказал, то проверяем расстояние между клиентом и водителем
-            if (!wasFoundRejected){
+            if (!wasFoundRejected && driver != null){
                 val driverCoordinates = coordinateService.getByUserId(driver.id)
                 val customerCoordinates = coordinateService.getByUserId(customer.id)
                 if (driverCoordinates != null && customerCoordinates != null) {

@@ -17,7 +17,12 @@ class OrdersService(val ordersRepository: OrdersRepository) {
 
     fun getByOrderUUID(uuid : String) : OrdersModel? = ordersRepository.getByUuid(uuid)
 
-    fun getByDriverID(id : Long) : OrdersModel? = ordersRepository.getAllByDriverID(id).last()
+
+    fun getByDriverID(id : Long) : OrdersModel? {
+        val orders = ordersRepository.getAllByDriverID(id)
+        return if (orders.isNotEmpty()) orders.last()
+        else null
+    }
 
     fun getByCustomerID(id : Long) : OrdersModel? {
         val list = ordersRepository.getAllByCustomerID(id)

@@ -10,7 +10,6 @@ interface DriverAvailableRepository : JpaRepository<DriverAvailableModel, Long> 
     @Suppress("SpringDataMethodInconsistencyInspection")
     fun findAllByIsWorking(working : Boolean = false) : List<DriverAvailableModel>
 
-    fun findByDriver(driver : UserModel) : DriverAvailableModel?
+    fun findByDriver_Id(id : Long) : DriverAvailableModel?
 
-    fun findByDriverID(id : Long) : DriverAvailableModel?
 }

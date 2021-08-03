@@ -19,14 +19,15 @@ class DriverAvailableController(private val driverAvailableService: DriverAvaila
 
     @PostMapping("/driver.get")
     fun getDriver(@RequestBody driver : DriverAvailableModel) : ResponseEntity<Any>{
-        val driverAvailable = driverAvailableService.getByDriverID(driver.driverID)
+        println(driver)
+        val driverAvailable = driverAvailableService.getByDriverID(driver.driver!!.id)
         return if (driverAvailable != null) okResponse(driverAvailable)
         else errorResponse()
     }
 
     @PostMapping("/driver.update")
     fun updateDriver(@RequestBody driver : DriverAvailableModel) : ResponseEntity<Any>{
-        var driverAvailable = driverAvailableService.getByDriverID(driver.driverID)
+        var driverAvailable = driverAvailableService.getByDriverID(driver.driver!!.id)
         println(driverAvailable)
         return if (driverAvailable != null){
             driverAvailable.isWorking = driver.isWorking
@@ -39,5 +40,7 @@ class DriverAvailableController(private val driverAvailableService: DriverAvaila
             else errorResponse()
         } else errorResponse()
     }
+
+
 
 }
