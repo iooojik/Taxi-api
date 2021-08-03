@@ -24,14 +24,12 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
     val logger = WebSocketEventListener.logger
 
     @MessageMapping("/order.make.{uuid}")//пользователь создал заказ
-    fun makeOrder(//isNew : Boolean = false, orderModel: OrdersModel? = null,
-        orderModel: OrdersModel = OrdersModel(),
+    fun makeOrder(orderModel: OrdersModel = OrdersModel(),
         @Payload c : UserModel, @DestinationVariable("uuid") customerUUID : String){
 
         //ищем пользователя в таблице
         val customer = userService.getByPhoneNumber(c.phone)
 
-        //val customer = userService.getByUserUUID(customerUUID)
         if (customer != null) {
             var order : OrdersModel? = null
             //если метод вызывается не повторно после отказа водителя, то создаём новый заказ, иначе ищем в списке заказов
@@ -51,6 +49,7 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
                 val orderUUID = order.uuid
                 //получение подходящего водителя
                 val foundDriver = getNearestDriver(customer, orderUUID)
+                println("found driver: $foundDriver")
                 if (foundDriver?.driver != null) {
                     //обновляем информацию о заказе
                     order.driverID = foundDriver.driver!!.id
@@ -61,7 +60,7 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
                         "/topic/${foundDriver.driver!!.uuid}",
                         ResponseModel(MessageType.ORDER_REQUEST, order)
                     )
-                    logger.info(order)
+                    logger.info("order: $order")
                 } else {
                     simpMessagingTemplate.convertAndSend(
                         "/topic/${customer.uuid}", ResponseModel(MessageType.NO_ORDERS, order)
@@ -162,13 +161,11 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
                         driverCoordinates.latitude, driverCoordinates.longitude
                     )
                     if (distance <= driverAv.rideDistance) map[distance] = driverAv
-                    logger.info("distance: $distance")
+                    logger.info("distance: $distance ${driver.id}")
                 }
             }
 
         }
-        logger.info("found: $map")
-
         //ищем подходящего водителя, сортируя сначала по дистанции, а потом по цене за минуту
         val comparator = compareBy<Pair<Double, DriverAvailableModel>>{it.first}
             .thenComparator { a: Pair<Double, DriverAvailableModel>, b: Pair<Double, DriverAvailableModel> ->
@@ -179,7 +176,7 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
             }
         //получаем первое значение - это и есть подходящий водитель
         val list = map.toList().sortedWith(comparator)
-        logger.info(list)
+        logger.info("found: $map")
         return if (list.isNotEmpty())
             list[0].second
         else {
@@ -196,7 +193,7 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
         dist = acos(dist)
         dist = rad2deg(dist)
         dist *= 1.609344 * 1000
-        return dist // in meters
+        return dist // in kmeters
     }
 
     /* The function to convert decimal into radians */

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface DriverAvailableRepository : JpaRepository<DriverAvailableModel, Long> {
     @Suppress("SpringDataMethodInconsistencyInspection")
-    fun findAllByIsWorking(working : Boolean = false) : List<DriverAvailableModel>
+    fun findAllByIsWorking(working : Boolean = true) : List<DriverAvailableModel>
 
     fun findByDriver_Id(id : Long) : DriverAvailableModel?
 

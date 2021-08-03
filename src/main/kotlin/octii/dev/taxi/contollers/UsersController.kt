@@ -72,7 +72,7 @@ class UsersController(private val userService: UserService,
             userModel.driver?.pricePerMinute = user.driver?.pricePerMinute!!
             userModel.driver?.priceWaitingMin = user.driver?.priceWaitingMin!!
             languageService.deleteAllLanguages(userModel.id)
-            user.languages.forEach {
+            user.languages?.forEach {
                 val savedLang = languageService.save(SpeakingLanguagesModel(language = it.language))
                 savedLang.user = userModel
                 languageService.save(savedLang)

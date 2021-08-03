@@ -24,6 +24,8 @@ class UserService(private val userRepository: UserRepository,
             //сохраняем пользователя и получаем его стандартные данные
             //сохраняем модель с координатами
             user.coordinates = null
+            user.driver = null
+            user.languages = null
             var savedUser = userRepository.save(user)
             savedUser.coordinates = coordinatesRepository.save(CoordinatesModel(user = savedUser))
             savedUser.languages = listOf(languageRepository.save(SpeakingLanguagesModel(user = savedUser)))

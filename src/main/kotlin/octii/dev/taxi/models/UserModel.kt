@@ -29,7 +29,7 @@ data class UserModel(
     @Column(name = "avatar_url")
     var avatarURL : String? = "",
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var languages : List<SpeakingLanguagesModel> = listOf(),
+    var languages : List<SpeakingLanguagesModel>? = listOf(),
     @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
     var coordinates : CoordinatesModel? = null,
     @OneToOne(mappedBy = "driver", cascade = [CascadeType.ALL])
