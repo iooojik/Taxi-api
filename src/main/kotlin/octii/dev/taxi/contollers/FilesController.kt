@@ -38,7 +38,8 @@ class FilesController(val userService: UserService, val usersToFilesService: Use
                 fileOutputStream.close()
                 val userModel = userService.getByUserUUID(userUUID)
                 if (userModel != null) {
-                    val url = "https://iooojik.ru${path.replaceFirst(".", "")}${convertedFile.name}"
+                    //val url = "https://iooojik.ru${path.replaceFirst(".", "")}${convertedFile.name}"
+                    val url = "http://192.168.0.101:8080${path.replaceFirst(".", "")}${convertedFile.name}"
                     when (type.lowercase()) {
                         Static.IMAGE_AVATAR_TYPE -> {
                             userService.changeAvatar(userModel, url)
