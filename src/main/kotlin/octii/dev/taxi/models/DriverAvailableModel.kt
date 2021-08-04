@@ -26,8 +26,11 @@ class DriverAvailableModel(
     var driver : UserModel? = null
 ) {
     override fun toString(): String {
-        return "{\"id\": ${this.id},\"rideDistance\": ${this.rideDistance}," +
-                "\"pricePerMinute\": ${this.pricePerMinute},\"pricePerKm\": ${this.pricePerKm}," +
-                "\"priceWaitingMin\": ${this.priceWaitingMin},\"isWorking\": ${this.isWorking} }"
+        return "{\"id\": ${this.id}," +
+                "\"rideDistance\": ${this.rideDistance}," +
+                "\"pricePerMinute\": ${this.pricePerMinute}," +
+                "\"pricePerKm\": ${this.pricePerKm}," +
+                "\"priceWaitingMin\": ${this.priceWaitingMin}," +
+                "\"isWorking\": ${this.isWorking} }"
     }
 }

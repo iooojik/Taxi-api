@@ -49,7 +49,7 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
                 val orderUUID = order.uuid
                 //получение подходящего водителя
                 val foundDriver = getNearestDriver(customer, orderUUID)
-                println("found driver: $foundDriver")
+
                 if (foundDriver?.driver != null) {
                     //обновляем информацию о заказе
                     order.driverID = foundDriver.driver!!.id
@@ -66,10 +66,16 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
                         "/topic/${customer.uuid}", ResponseModel(MessageType.NO_ORDERS, order)
                     )
                 }
+            } else {
+                simpMessagingTemplate.convertAndSend(
+                    "/topic/${customerUUID}", ResponseModel(MessageType.NO_ORDERS, orderModel)
+                )
             }
+        } else {
+            simpMessagingTemplate.convertAndSend(
+                "/topic/${customerUUID}", ResponseModel(MessageType.NO_ORDERS, orderModel)
+            )
         }
-
-
     }
 
     @MessageMapping("/order.accept.{uuid}") //водитель принял заказ

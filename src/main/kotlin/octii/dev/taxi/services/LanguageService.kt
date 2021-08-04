@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LanguageService(private val languageRepository: LanguageRepository) {
-    @Transactional
+
     fun deleteAllLanguages(userId : Long) = languageRepository.deleteAllByUserId(userId)
 
     fun deleteAll(userModel: UserModel) = languageRepository.deleteAllByUser(userModel)

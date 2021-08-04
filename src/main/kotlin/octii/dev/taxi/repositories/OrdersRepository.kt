@@ -11,4 +11,6 @@ interface OrdersRepository: JpaRepository<OrdersModel, Long> {
     fun getAllByDriverID(driverID: Long) : List<OrdersModel>
 
     fun getAllByCustomerID(customerID: Long) : List<OrdersModel>
+
+    fun findAllByIsFinished(isFinished : Boolean) : List<OrdersModel>
 }
