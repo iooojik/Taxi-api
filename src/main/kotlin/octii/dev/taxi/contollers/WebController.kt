@@ -1,7 +1,6 @@
 package octii.dev.taxi.contollers
 
 import octii.dev.taxi.ResponseGenerator
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import java.io.BufferedOutputStream
@@ -16,6 +15,9 @@ import javax.servlet.http.HttpServletResponse
 @Controller
 @RequestMapping("/*")
 class WebController : ResponseGenerator {
+
+    @GetMapping("/")
+    fun index() : String = "index"
 
     @GetMapping("/images/*/*")
     @ResponseBody

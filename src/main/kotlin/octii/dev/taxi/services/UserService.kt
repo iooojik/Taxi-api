@@ -10,11 +10,12 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class UserService(private val userRepository: UserRepository,
+class UserService(val userRepository: UserRepository,
                   val driverAvailableRepository: DriverAvailableRepository,
                   val languageService: LanguageService,
                   val coordinatesRepository: CoordinatesRepository,
-                  val languageRepository: LanguageRepository, val ordersService: OrdersService) {
+                  val languageRepository: LanguageRepository,
+                  val ordersService: OrdersService, val usersToFilesService: UsersToFilesService) {
 
     fun getAllUsers(): List<UserModel> = userRepository.findAll()
 
@@ -48,11 +49,11 @@ class UserService(private val userRepository: UserRepository,
             foundUser.token = UUID.randomUUID().toString().replace("-", "")
 
             foundUser = userRepository.save(foundUser)
-            AuthorizationModel(foundUser, getLastOrder(foundUser))
+            AuthorizationModel(changeFilesToResp(foundUser), getLastOrder(foundUser))
         } else {
             //если такого пользователя не существует, то создаём нового
             val registered = registerUser(user)
-            AuthorizationModel(registered, getLastOrder(registered))
+            AuthorizationModel(changeFilesToResp(registered), getLastOrder(registered))
         }
     }
 
@@ -61,7 +62,7 @@ class UserService(private val userRepository: UserRepository,
         return if (foundUser != null){
             foundUser.token = UUID.randomUUID().toString()
             foundUser = userRepository.save(foundUser)
-            AuthorizationModel(foundUser, getLastOrder(foundUser))
+            AuthorizationModel(changeFilesToResp(foundUser), getLastOrder(foundUser))
         } else AuthorizationModel(foundUser)
     }
 
@@ -88,7 +89,6 @@ class UserService(private val userRepository: UserRepository,
             userModel.driver?.pricePerKm = oldUser.driver?.pricePerKm!!
             userModel.driver?.pricePerMinute = oldUser.driver?.pricePerMinute!!
             userModel.driver?.priceWaitingMin = oldUser.driver?.priceWaitingMin!!
-
             languageService.deleteAllLanguages(userModel.id)
             val savedLanguages = arrayListOf<SpeakingLanguagesModel>()
             if (oldUser.languages?.isNotEmpty() == true) {
@@ -108,8 +108,13 @@ class UserService(private val userRepository: UserRepository,
             } else {
                 saveLanguage(userModel = userModel)
             }
-            return userRepository.save(userModel)
+            return changeFilesToResp(userRepository.save(userModel))
         } else return UserModel()
+    }
+
+    private fun changeFilesToResp(newUser: UserModel) : UserModel{
+        newUser.files = usersToFilesService.getAllNew(newUser.id)
+        return newUser
     }
 
     private fun saveLanguage(language : String = "sr", userModel: UserModel) : SpeakingLanguagesModel{

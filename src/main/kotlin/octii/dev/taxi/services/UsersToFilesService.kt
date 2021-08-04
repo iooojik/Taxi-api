@@ -5,7 +5,7 @@ import octii.dev.taxi.repositories.UsersToFilesRepository
 import org.springframework.stereotype.Service
 
 @Service
-class UsersToFilesService(val userService: UserService, val usersToFilesRepository: UsersToFilesRepository) {
+class UsersToFilesService(val usersToFilesRepository: UsersToFilesRepository) {
 
     fun saveFile(usersToFiles: UsersToFiles) : UsersToFiles{
         if (usersToFiles.user != null){
@@ -16,6 +16,10 @@ class UsersToFilesService(val userService: UserService, val usersToFilesReposito
             }
         }
         return usersToFilesRepository.save(usersToFiles)
+    }
+
+    fun getAllNew(userId : Long) : List<UsersToFiles> {
+        return usersToFilesRepository.findAllByUserIdAndIsNew(userId, true) ?: listOf()
     }
 
     fun delete(usersToFiles: UsersToFiles) = usersToFilesRepository.delete(usersToFiles)
