@@ -1,6 +1,7 @@
 package octii.dev.taxi.contollers
 
 import octii.dev.taxi.ResponseGenerator
+import octii.dev.taxi.models.OrdersModel
 import octii.dev.taxi.models.UserModel
 import octii.dev.taxi.services.OrdersService
 import org.springframework.http.ResponseEntity
@@ -27,7 +28,9 @@ class OrdersController(private val ordersService: OrdersService) : ResponseGener
         else{
             var order = ordersService.getOrderByDriverID(userModel.id)
             if (order.id < 1) order = ordersService.getOrderByCustomerID(userModel.id)
-            okResponse(order)
+            if (order.driverID != null)
+                okResponse(order)
+            else okResponse(OrdersModel())
         }
     }
 
