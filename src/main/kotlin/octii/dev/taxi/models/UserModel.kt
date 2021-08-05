@@ -33,7 +33,7 @@ data class UserModel(
     @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
     var coordinates : CoordinatesModel? = null,
     @OneToOne(mappedBy = "driver", cascade = [CascadeType.ALL])
-    var driver : DriverAvailableModel? = null,
+    var driver : DriverModel? = null,
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var files : List<UsersToFiles>? = listOf(),
 )

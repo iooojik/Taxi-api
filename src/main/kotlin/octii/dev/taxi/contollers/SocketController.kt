@@ -17,7 +17,7 @@ import kotlin.math.sin
 
 @Controller
 class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
-                       val userService: UserService, val driverAvailableService: DriverAvailableService,
+                       val userService: UserService, val driverService: DriverService,
                        val ordersService: OrdersService, val rejectedOrdersService: RejectedOrdersService,
                        val coordinateService: CoordinateService) {
 
@@ -154,14 +154,14 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
 
     }
 
-    private fun getNearestDriver(customer : UserModel, orderUUID: String) : DriverAvailableModel? {
+    private fun getNearestDriver(customer : UserModel, orderUUID: String) : DriverModel? {
         //получаем список доступных водителей
-        val availableDrivers = driverAvailableService.getAll()
+        val availableDrivers = driverService.getAll()
         logger.info("available: $availableDrivers")
         //получаем список водителей, которые отказались от выполнения заказа
         val rejectedOrders = rejectedOrdersService.getByOrderUUID(orderUUID)
         //подходящие водители
-        val map : HashMap<Double, DriverAvailableModel> = hashMapOf()
+        val map : HashMap<Double, DriverModel> = hashMapOf()
 
         for (driverAv in availableDrivers){
             val driver = driverAv.driver
@@ -187,11 +187,11 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
 
         }
         //ищем подходящего водителя, сортируя сначала по дистанции, а потом по цене за минуту
-        val comparator = compareBy<Pair<Double, DriverAvailableModel>>{it.first}
-            .thenComparator { a: Pair<Double, DriverAvailableModel>, b: Pair<Double, DriverAvailableModel> ->
+        val comparator = compareBy<Pair<Double, DriverModel>>{it.first}
+            .thenComparator { a: Pair<Double, DriverModel>, b: Pair<Double, DriverModel> ->
                 compareValues(
                     a.first,
-                    b.second.pricePerMinute
+                    b.second.prices?.pricePerMinute
                 )
             }
         //получаем первое значение - это и есть подходящий водитель

@@ -3,7 +3,7 @@ package octii.dev.taxi.services
 import octii.dev.taxi.constants.Static
 import octii.dev.taxi.models.*
 import octii.dev.taxi.repositories.CoordinatesRepository
-import octii.dev.taxi.repositories.DriverAvailableRepository
+import octii.dev.taxi.repositories.DriverRepository
 import octii.dev.taxi.repositories.LanguageRepository
 import octii.dev.taxi.repositories.UserRepository
 import org.springframework.stereotype.Service
@@ -11,11 +11,12 @@ import java.util.*
 
 @Service
 class UserService(val userRepository: UserRepository,
-                  val driverAvailableRepository: DriverAvailableRepository,
+                  val driverRepository: DriverRepository,
                   val languageService: LanguageService,
                   val coordinatesRepository: CoordinatesRepository,
                   val languageRepository: LanguageRepository,
-                  val ordersService: OrdersService, val usersToFilesService: UsersToFilesService) {
+                  val ordersService: OrdersService,
+                  val usersToFilesService: UsersToFilesService, val pricesService: PricesService) {
 
     fun getAllUsers(): List<UserModel> = userRepository.findAll()
 
@@ -28,9 +29,11 @@ class UserService(val userRepository: UserRepository,
         user.languages = null
         if (user.type == Static.DRIVER_TYPE) user.isOnlyClient = false
         var savedUser = userRepository.save(user)
+
         savedUser.coordinates = coordinatesRepository.save(CoordinatesModel(user = savedUser))
         savedUser.languages = listOf(languageRepository.save(SpeakingLanguagesModel(user = savedUser)))
-        savedUser.driver = driverAvailableRepository.save(DriverAvailableModel(driver = savedUser))
+        savedUser.driver = driverRepository.save(DriverModel(driver = savedUser))
+        savedUser.driver!!.prices = pricesService.save(Prices(driver = savedUser.driver))
         savedUser.token = UUID.randomUUID().toString()
         savedUser.uuid = UUID.randomUUID().toString()
         //обновляем данные пользователя
@@ -87,9 +90,13 @@ class UserService(val userRepository: UserRepository,
             userModel.coordinates?.latitude = oldUser.coordinates?.latitude!!
             userModel.driver?.isWorking = oldUser.driver?.isWorking!!
             userModel.driver?.rideDistance = oldUser.driver?.rideDistance!!
-            userModel.driver?.pricePerKm = oldUser.driver?.pricePerKm!!
-            userModel.driver?.pricePerMinute = oldUser.driver?.pricePerMinute!!
-            userModel.driver?.priceWaitingMin = oldUser.driver?.priceWaitingMin!!
+
+            userModel.driver?.prices?.pricePerKm = if (oldUser.driver?.prices?.pricePerKm != null) oldUser.driver?.prices?.pricePerKm!! else 10f
+            userModel.driver?.prices?.pricePerMinute =
+                if (oldUser.driver?.prices?.pricePerMinute != null) oldUser.driver?.prices?.pricePerMinute!! else 1f
+            userModel.driver?.prices?.priceWaitingMin =
+                if (oldUser.driver?.prices?.priceWaitingMin != null) oldUser.driver?.prices?.priceWaitingMin!! else 1f
+
             languageService.deleteAllLanguages(userModel.id)
             val savedLanguages = arrayListOf<SpeakingLanguagesModel>()
             if (oldUser.languages?.isNotEmpty() == true) {
