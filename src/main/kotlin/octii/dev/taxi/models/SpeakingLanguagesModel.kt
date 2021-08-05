@@ -20,6 +20,6 @@ class SpeakingLanguagesModel(
     var user : UserModel? = null
 ) {
     override fun toString(): String {
-        return "{\"id\": ${this.id},\"language\": ${this.language}}"
+        return "{\"language\": ${this.language}}"
     }
 }

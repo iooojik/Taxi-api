@@ -1,13 +1,11 @@
 package octii.dev.taxi.contollers
 
 import octii.dev.taxi.ResponseGenerator
+import octii.dev.taxi.models.UserModel
 import octii.dev.taxi.services.OrdersService
-import octii.dev.taxi.services.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @Controller
@@ -22,5 +20,15 @@ class OrdersController(private val ordersService: OrdersService) : ResponseGener
 
     @GetMapping("/not.completed")
     fun getNotCompletedOrders() : ResponseEntity<Any> = okResponse(ordersService.getAllNotCompleted())
+
+    @PostMapping("/check")
+    fun ordersCheck(@RequestBody userModel: UserModel) : ResponseEntity<Any> {
+        return if (userModel.id < 0) errorResponse()
+        else{
+            var order = ordersService.getOrderByDriverID(userModel.id)
+            if (order.id < 1) order = ordersService.getOrderByCustomerID(userModel.id)
+            okResponse(order)
+        }
+    }
 
 }

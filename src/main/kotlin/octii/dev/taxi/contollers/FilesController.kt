@@ -25,7 +25,7 @@ class FilesController(val userService: UserService, val usersToFilesService: Use
     fun handleImageUpload(@RequestParam file: MultipartFile, @RequestParam type : String,
                           @RequestParam userUUID : String): ResponseEntity<Any> {
         return if (!file.isEmpty) {
-            val path = "./images/${type.lowercase()}/"
+            val path = "/home/tomcat/taxi/images/${type.lowercase()}/"
             val convertedFile =
                 File(//"/home/admin/web/iooojik.ru/public_html" + path+
                     path + DigestUtils.md5DigestAsHex((file.originalFilename + Date().time).toByteArray())
@@ -38,8 +38,8 @@ class FilesController(val userService: UserService, val usersToFilesService: Use
                 fileOutputStream.close()
                 val userModel = userService.getByUserUUID(userUUID)
                 if (userModel != null) {
-                    //val url = "https://iooojik.ru${path.replaceFirst(".", "")}${convertedFile.name}"
-                    val url = "http://192.168.0.101:8080${path.replaceFirst(".", "")}${convertedFile.name}"
+                    val url = "https://iooojik.ru/taxi/images/$type/${convertedFile.name}"
+                    //val url = "http://192.168.0.101:8080${path.replaceFirst(".", "")}${convertedFile.name}"
                     when (type.lowercase()) {
                         Static.IMAGE_AVATAR_TYPE -> {
                             userService.changeAvatar(userModel, url)
