@@ -26,6 +26,7 @@ class UserService(val userRepository: UserRepository,
         user.coordinates = null
         user.driver = null
         user.languages = null
+        if (user.type == Static.DRIVER_TYPE) user.isOnlyClient = false
         var savedUser = userRepository.save(user)
         savedUser.coordinates = coordinatesRepository.save(CoordinatesModel(user = savedUser))
         savedUser.languages = listOf(languageRepository.save(SpeakingLanguagesModel(user = savedUser)))

@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "files")
-data class UsersToFiles(
+class UsersToFiles(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "_id")
@@ -24,4 +24,15 @@ data class UsersToFiles(
     @JoinColumn(name = "user_id")
     @JsonBackReference
     var user : UserModel? = null
-)
+) {
+    override fun toString(): String {
+        return "{\n" +
+                "                \"id\": $id,\n" +
+                "                \"url\": \"$url\",\n" +
+                "                \"fileName\": \"$fileName\",\n" +
+                "                \"fileExtension\": \"$fileExtension\",\n" +
+                "                \"type\": \"$type\",\n" +
+                "                \"isNew\": $isNew\n" +
+                "            }"
+    }
+}

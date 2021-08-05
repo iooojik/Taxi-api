@@ -26,7 +26,7 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
     @MessageMapping("/order.make.{uuid}")//пользователь создал заказ
     fun makeOrder(orderModel: OrdersModel = OrdersModel(),
         @Payload c : UserModel, @DestinationVariable("uuid") customerUUID : String){
-
+        println("order was made")
         //ищем пользователя в таблице
         val customer = userService.getByPhoneNumber(c.phone)
 
@@ -55,7 +55,7 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
                     order.driverID = foundDriver.driver!!.id
                     order = ordersService.update(order)
                     //отправляем найденному водителю предложение о заказе
-                    logger.info(foundDriver.driver!!.uuid)
+                    println("uuid: ${foundDriver.driver!!.uuid}")
                     simpMessagingTemplate.convertAndSend(
                         "/topic/${foundDriver.driver!!.uuid}",
                         ResponseModel(MessageType.ORDER_REQUEST, order)
@@ -80,26 +80,34 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
 
     @MessageMapping("/order.accept.{uuid}") //водитель принял заказ
     fun acceptOrder(@Payload orderModel: OrdersModel, @DestinationVariable("uuid") driverUUID : String){
+        println("order accepted")
         val order = ordersService.getByOrderUUID(orderModel.uuid)
-
+        println(driverUUID)
         if (order != null) {
             val driver = userService.getByUserUUID(driverUUID)
+
             order.driverID = driver?.id
-            order.driver = driver
+            order.driver = driver!!
             ordersService.update(order)
+            println(order.driver)
+            println(order.customer)
+
             simpMessagingTemplate.convertAndSend(
-                "/topic/${orderModel.customer!!.uuid}",
+                "/topic/${order.driver!!.uuid}",
                 ResponseModel(MessageType.ORDER_ACCEPT, order)
             )
+
             simpMessagingTemplate.convertAndSend(
-                "/topic/${orderModel.driver!!.uuid}",
+                "/topic/${order.customer!!.uuid}",
                 ResponseModel(MessageType.ORDER_ACCEPT, order)
             )
+            println("sent")
         }
     }
 
     @MessageMapping("/order.reject.{uuid}") //водитель отказался от заказа
     fun rejectOrder(@Payload orderModel: OrdersModel, @DestinationVariable("uuid") driverUUID : String){
+        println("order rejected")
         val order = ordersService.getByOrderUUID(orderModel.uuid)
         if (order != null) {
             rejectedOrdersService.reject(RejectedOrdersModel(driverUUID = driverUUID, orderUuid = order.uuid))
@@ -111,6 +119,7 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
 
     @MessageMapping("/order.finish.{uuid}") //водитель отказался от заказа
     fun finishOrder(@Payload orderModel: OrdersModel, @DestinationVariable("uuid") driverUUID : String){
+        println("order finished")
         val order = ordersService.getByOrderUUID(orderModel.uuid)
         if (order != null) {
             order.isFinished = true
@@ -127,7 +136,7 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
         }
     }
 
-    @MessageMapping("/navigation.coordinates.update.{uuid}")
+    @MessageMapping("/navigation.coordinates.update.{uuid}") //обновление координат
     fun updateCoordinates(@Payload coordinates : CoordinatesModel, @DestinationVariable("uuid") userUUID : String){
         val user = userService.getByUserUUID(userUUID)
         if (user != null){
@@ -138,6 +147,11 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
             "/topic/$userUUID",
             ResponseModel(MessageType.COORDINATES_UPDATE, coordinates)
         )
+    }
+
+    @MessageMapping("/taximeter.update.{uuid}")
+    fun taximeterUpdate(@DestinationVariable("uuid") userUUID: String){
+
     }
 
     private fun getNearestDriver(customer : UserModel, orderUUID: String) : DriverAvailableModel? {
