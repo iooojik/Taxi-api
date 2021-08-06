@@ -10,4 +10,6 @@ class TaximeterService(val userService: UserService, val ordersService: OrdersSe
 
     fun getAll() : List<TaximeterModel> = taximeterRepository.findAll()
 
+    fun save(taximeterModel: TaximeterModel) : TaximeterModel = taximeterRepository.save(taximeterModel)
+
 }

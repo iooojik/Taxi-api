@@ -66,7 +66,8 @@ class UserService(val userRepository: UserRepository,
         return if (foundUser != null){
             foundUser.token = UUID.randomUUID().toString()
             foundUser = userRepository.save(foundUser)
-            AuthorizationModel(changeFilesToResp(foundUser), getLastOrder(foundUser))
+            val lastOrder = getLastOrder(foundUser)
+            AuthorizationModel(changeFilesToResp(foundUser), if (lastOrder.isFinished) null else lastOrder)
         } else AuthorizationModel(foundUser)
     }
 
@@ -90,7 +91,7 @@ class UserService(val userRepository: UserRepository,
             userModel.coordinates?.latitude = oldUser.coordinates?.latitude!!
             userModel.driver?.isWorking = oldUser.driver?.isWorking!!
             userModel.driver?.rideDistance = oldUser.driver?.rideDistance!!
-
+            println(oldUser)
             userModel.driver?.prices?.pricePerKm = if (oldUser.driver?.prices?.pricePerKm != null) oldUser.driver?.prices?.pricePerKm!! else 10f
             userModel.driver?.prices?.pricePerMinute =
                 if (oldUser.driver?.prices?.pricePerMinute != null) oldUser.driver?.prices?.pricePerMinute!! else 1f

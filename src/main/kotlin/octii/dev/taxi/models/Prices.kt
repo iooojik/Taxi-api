@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "prices")
-data class Prices(
+class Prices(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "_id")
@@ -21,4 +21,11 @@ data class Prices(
     @JoinColumn(name = "driver_id")
     @JsonIgnore
     var driver : DriverModel? = null,
-)
+){
+    override fun toString(): String {
+        return "{\"id\": ${this.id}," +
+                "\"pricePerMinute\": ${this.pricePerMinute}," +
+                "\"pricePerKm\": ${this.pricePerKm}," +
+                "\"priceWaitingMin\": ${this.priceWaitingMin} }"
+    }
+}

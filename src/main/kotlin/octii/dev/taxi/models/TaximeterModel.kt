@@ -12,11 +12,22 @@ data class TaximeterModel(
     @Column(name = "_id")
     var id: Long = -1,
     @Column(name = "timestamp")
-    var timeStamp : String = Date().toString(),
+    var timeStamp : String? = Date().toString(),
     @Column(name = "action")
     var action : String = OrderActions.ACTION_NO,
-    @OneToOne
+    @Column(name = "coordinates_id", insertable = false, updatable = false)
+    var coordinatesId : Long? = (-1).toLong(),
+    @Column(name = "prices_id", insertable = false, updatable = false)
+    var pricesId : Long? = (-1).toLong(),
+    @Column(name = "order_id", insertable = false, updatable = false)
+    var orderId : Long? = (-1).toLong(),
+    @ManyToOne(cascade = [CascadeType.DETACH])
+    @JoinColumn(name = "coordinates_id", referencedColumnName = "_id")
     var coordinates : CoordinatesModel = CoordinatesModel(),
-    @OneToOne
-    var prices : Prices = Prices()
+    @ManyToOne(cascade = [CascadeType.DETACH])
+    @JoinColumn(name = "prices_id", referencedColumnName = "_id")
+    var prices : Prices = Prices(),
+    @ManyToOne(cascade = [CascadeType.DETACH])
+    @JoinColumn(name = "order_id", referencedColumnName = "_id")
+    var orderModel: OrdersModel = OrdersModel()
 )
