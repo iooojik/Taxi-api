@@ -227,16 +227,15 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
         }
     }
 
-    private fun calcDistance(lat1 : Double, lon1 : Double, lat2 : Double, lon2 : Double): Double {
-        val theta = lon1 - lon2
-        var dist =
-            sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(
-                deg2rad(theta)
-            )
-        dist = acos(dist)
-        dist = rad2deg(dist)
-        dist *= 1.609344 * 1000
-        return dist // in kmeters
+    fun calcDistance(lat1 : Double, lon1 : Double, lat2 : Double, lon2 : Double): Double {
+        val earthRad = 6371.0
+        val lat1r = deg2rad(lat1)
+        val lon1r = deg2rad(lon1)
+        val lat2r = deg2rad(lat2)
+        val lon2r = deg2rad(lon2)
+        val u = Math.sin((lat2r - lat1r)/2)
+        val v = Math.sin((lon2r - lon1r)/2)
+        return 2.0 * earthRad * Math.asin(Math.sqrt(u * u + Math.cos(lat1r) * Math.cos(lat2r) * v * v))
     }
 
     /* The function to convert decimal into radians */

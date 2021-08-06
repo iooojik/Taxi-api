@@ -21,9 +21,12 @@ class WebController : ResponseGenerator {
     @GetMapping("/images/*/*")
     @ResponseBody
     fun serveFile(request : HttpServletRequest, response : HttpServletResponse){
-        val type = request.requestURL.toString().split("/")[4]
+        //val type = request.requestURL.toString().split("/")[4]
+        val type = request.requestURL.toString().split("/")[5]
         val fileName = request.requestURL.toString().substring(request.requestURL.toString().lastIndexOf('/') + 1)
-        val file = File("./images/${type.lowercase()}/$fileName")
+        val path = "/home/tomcat/taxi/images/${type.lowercase()}"
+        //val path = "./images/${type.lowercase()}/"
+        val file = File("$path/$fileName")
         //response.setHeader("Content-Disposition", "attachment; filename=${file.name}")
         response.setHeader("Content-transfer-Encoding", "binary")
         response.setHeader("content-type", "image/jpeg")

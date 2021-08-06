@@ -89,14 +89,14 @@ class UserService(val userRepository: UserRepository,
             userModel.type = oldUser.type
             userModel.coordinates?.longitude = oldUser.coordinates?.longitude!!
             userModel.coordinates?.latitude = oldUser.coordinates?.latitude!!
-            userModel.driver?.isWorking = oldUser.driver?.isWorking!!
             userModel.driver?.rideDistance = oldUser.driver?.rideDistance!!
-            println(oldUser)
             userModel.driver?.prices?.pricePerKm = if (oldUser.driver?.prices?.pricePerKm != null) oldUser.driver?.prices?.pricePerKm!! else 10f
             userModel.driver?.prices?.pricePerMinute =
                 if (oldUser.driver?.prices?.pricePerMinute != null) oldUser.driver?.prices?.pricePerMinute!! else 1f
             userModel.driver?.prices?.priceWaitingMin =
                 if (oldUser.driver?.prices?.priceWaitingMin != null) oldUser.driver?.prices?.priceWaitingMin!! else 1f
+
+            userModel.driver!!.isWorking = if (userModel.type == Static.CLIENT_TYPE) false else oldUser.driver!!.isWorking
 
             languageService.deleteAllLanguages(userModel.id)
             val savedLanguages = arrayListOf<SpeakingLanguagesModel>()
