@@ -1,13 +1,13 @@
 package octii.dev.taxi.services
 
-import octii.dev.taxi.models.UsersToFiles
+import octii.dev.taxi.models.database.UsersToFiles
 import octii.dev.taxi.repositories.UsersToFilesRepository
 import org.springframework.stereotype.Service
 
 @Service
 class UsersToFilesService(val usersToFilesRepository: UsersToFilesRepository) {
 
-    fun saveFile(usersToFiles: UsersToFiles) : UsersToFiles{
+    fun saveFile(usersToFiles: UsersToFiles) : UsersToFiles {
         if (usersToFiles.user != null){
             val foundFile = usersToFilesRepository.findByUserIdAndIsNewAndType(usersToFiles.user!!.id, true, usersToFiles.type)
             if (foundFile != null){

@@ -1,4 +1,4 @@
-package octii.dev.taxi.models
+package octii.dev.taxi.models.database
 
 import java.util.*
 import javax.persistence.*

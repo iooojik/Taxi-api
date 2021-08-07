@@ -1,6 +1,6 @@
 package octii.dev.taxi.services
 
-import octii.dev.taxi.models.DriverModel
+import octii.dev.taxi.models.database.DriverModel
 import octii.dev.taxi.repositories.DriverRepository
 import org.springframework.stereotype.Service
 

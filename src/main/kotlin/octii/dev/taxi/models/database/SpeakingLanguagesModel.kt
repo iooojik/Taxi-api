@@ -1,4 +1,4 @@
-package octii.dev.taxi.models
+package octii.dev.taxi.models.database
 
 import com.fasterxml.jackson.annotation.JsonBackReference
 import javax.persistence.*

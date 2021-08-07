@@ -1,6 +1,7 @@
-package octii.dev.taxi.models
+package octii.dev.taxi.models.database
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import octii.dev.taxi.models.Prices
 import javax.persistence.*
 
 @Entity

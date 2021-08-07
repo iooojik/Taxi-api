@@ -1,6 +1,6 @@
 package octii.dev.taxi.repositories
 
-import octii.dev.taxi.models.OrdersModel
+import octii.dev.taxi.models.database.OrdersModel
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

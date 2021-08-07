@@ -1,7 +1,9 @@
 package octii.dev.taxi.services
 
 import octii.dev.taxi.constants.Static
-import octii.dev.taxi.models.*
+import octii.dev.taxi.models.AuthorizationModel
+import octii.dev.taxi.models.Prices
+import octii.dev.taxi.models.database.*
 import octii.dev.taxi.repositories.CoordinatesRepository
 import octii.dev.taxi.repositories.DriverRepository
 import octii.dev.taxi.repositories.LanguageRepository
@@ -121,12 +123,12 @@ class UserService(val userRepository: UserRepository,
         } else return UserModel()
     }
 
-    private fun changeFilesToResp(newUser: UserModel) : UserModel{
+    private fun changeFilesToResp(newUser: UserModel) : UserModel {
         newUser.files = usersToFilesService.getAllNew(newUser.id)
         return newUser
     }
 
-    private fun saveLanguage(language : String = "sr", userModel: UserModel) : SpeakingLanguagesModel{
+    private fun saveLanguage(language : String = "sr", userModel: UserModel) : SpeakingLanguagesModel {
         val savedLang = languageService.save(SpeakingLanguagesModel(language = language, userId = userModel.id, user = userModel))
         savedLang.user = userModel
         return languageService.save(savedLang)

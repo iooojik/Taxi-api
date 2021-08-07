@@ -1,8 +1,8 @@
 package octii.dev.taxi.contollers
 
 import octii.dev.taxi.ResponseGenerator
-import octii.dev.taxi.models.OrdersModel
-import octii.dev.taxi.models.UserModel
+import octii.dev.taxi.models.database.OrdersModel
+import octii.dev.taxi.models.database.UserModel
 import octii.dev.taxi.services.OrdersService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller

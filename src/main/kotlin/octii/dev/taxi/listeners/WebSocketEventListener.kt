@@ -1,13 +1,13 @@
 package octii.dev.taxi.listeners
 
 import org.hibernate.annotations.common.util.impl.LoggerFactory
+import org.jboss.logging.Logger
 import org.springframework.context.event.EventListener
 import org.springframework.messaging.simp.SimpMessageSendingOperations
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.messaging.SessionConnectedEvent
 import org.springframework.web.socket.messaging.SessionDisconnectEvent
-import org.jboss.logging.Logger
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 
 
 @Component

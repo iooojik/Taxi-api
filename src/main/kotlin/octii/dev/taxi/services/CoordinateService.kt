@@ -1,6 +1,6 @@
 package octii.dev.taxi.services
 
-import octii.dev.taxi.models.CoordinatesModel
+import octii.dev.taxi.models.database.CoordinatesModel
 import octii.dev.taxi.repositories.CoordinatesRepository
 import org.springframework.stereotype.Service
 

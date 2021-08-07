@@ -1,6 +1,6 @@
 package octii.dev.taxi.services
 
-import octii.dev.taxi.models.TaximeterModel
+import octii.dev.taxi.models.database.TaximeterModel
 import octii.dev.taxi.repositories.TaximeterRepository
 import org.springframework.stereotype.Service
 

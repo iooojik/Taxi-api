@@ -1,6 +1,6 @@
 package octii.dev.taxi.services
 
-import octii.dev.taxi.models.RejectedOrdersModel
+import octii.dev.taxi.models.database.RejectedOrdersModel
 import octii.dev.taxi.repositories.OrdersRepository
 import octii.dev.taxi.repositories.RejectedOrdersRepository
 import org.springframework.stereotype.Service

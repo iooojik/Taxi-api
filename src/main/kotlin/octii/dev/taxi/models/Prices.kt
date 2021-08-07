@@ -1,6 +1,7 @@
 package octii.dev.taxi.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import octii.dev.taxi.models.database.DriverModel
 import javax.persistence.*
 
 

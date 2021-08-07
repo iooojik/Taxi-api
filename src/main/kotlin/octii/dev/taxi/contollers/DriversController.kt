@@ -1,7 +1,7 @@
 package octii.dev.taxi.contollers
 
 import octii.dev.taxi.ResponseGenerator
-import octii.dev.taxi.models.DriverModel
+import octii.dev.taxi.models.database.DriverModel
 import octii.dev.taxi.services.DriverService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller

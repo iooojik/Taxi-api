@@ -2,7 +2,7 @@ package octii.dev.taxi.contollers
 
 import octii.dev.taxi.ResponseGenerator
 import octii.dev.taxi.constants.Static
-import octii.dev.taxi.models.UsersToFiles
+import octii.dev.taxi.models.database.UsersToFiles
 import octii.dev.taxi.services.UserService
 import octii.dev.taxi.services.UsersToFilesService
 import org.springframework.boot.web.servlet.MultipartConfigFactory

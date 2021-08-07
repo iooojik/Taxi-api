@@ -1,13 +1,13 @@
 package octii.dev.taxi.services
 
-import octii.dev.taxi.models.OrdersModel
+import octii.dev.taxi.models.database.OrdersModel
 import octii.dev.taxi.repositories.OrdersRepository
 import org.springframework.stereotype.Service
 
 @Service
 class OrdersService(val ordersRepository: OrdersRepository) {
 
-    fun registerNewOrder(orderModel : OrdersModel) : OrdersModel{
+    fun registerNewOrder(orderModel : OrdersModel) : OrdersModel {
         return ordersRepository.save(orderModel)
     }
 

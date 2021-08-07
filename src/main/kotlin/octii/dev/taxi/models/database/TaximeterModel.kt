@@ -1,6 +1,7 @@
-package octii.dev.taxi.models
+package octii.dev.taxi.models.database
 
 import octii.dev.taxi.constants.OrderActions
+import octii.dev.taxi.models.Prices
 import java.util.*
 import javax.persistence.*
 

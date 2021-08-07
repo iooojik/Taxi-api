@@ -1,8 +1,10 @@
 package octii.dev.taxi.contollers
 
-import octii.dev.taxi.constants.Static
 import octii.dev.taxi.listeners.WebSocketEventListener
-import octii.dev.taxi.models.*
+import octii.dev.taxi.models.MessageType
+import octii.dev.taxi.models.ResponseModel
+import octii.dev.taxi.models.TaximeterUpdate
+import octii.dev.taxi.models.database.*
 import octii.dev.taxi.services.*
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -10,10 +12,6 @@ import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Controller
 import java.util.*
-import kotlin.collections.HashMap
-import kotlin.math.acos
-import kotlin.math.cos
-import kotlin.math.sin
 
 
 @Controller
@@ -26,7 +24,7 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
 
     @MessageMapping("/order.make.{uuid}")//пользователь создал заказ
     fun makeOrder(orderModel: OrdersModel = OrdersModel(),
-        @Payload c : UserModel, @DestinationVariable("uuid") customerUUID : String){
+                  @Payload c : UserModel, @DestinationVariable("uuid") customerUUID : String){
         println("order was made")
         //ищем пользователя в таблице
         val customer = userService.getByPhoneNumber(c.phone)

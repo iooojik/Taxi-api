@@ -1,12 +1,8 @@
 package octii.dev.taxi.contollers
 
 import octii.dev.taxi.ResponseGenerator
-import octii.dev.taxi.constants.Static
 import octii.dev.taxi.constants.StaticMessages
-import octii.dev.taxi.models.OrdersModel
-import octii.dev.taxi.models.SpeakingLanguagesModel
-import octii.dev.taxi.models.AuthorizationModel
-import octii.dev.taxi.models.UserModel
+import octii.dev.taxi.models.database.UserModel
 import octii.dev.taxi.services.LanguageService
 import octii.dev.taxi.services.OrdersService
 import octii.dev.taxi.services.UserService
