@@ -10,6 +10,7 @@ import octii.dev.taxi.repositories.LanguageRepository
 import octii.dev.taxi.repositories.UserRepository
 import org.springframework.stereotype.Service
 import java.util.*
+import java.util.stream.Collectors
 
 @Service
 class UserService(val userRepository: UserRepository,
@@ -103,35 +104,25 @@ class UserService(val userRepository: UserRepository,
                 if (oldUser.driver?.prices?.priceWaitingMin != null) oldUser.driver?.prices?.priceWaitingMin!! else 1f
 
             userModel.driver!!.isWorking = if (userModel.type == Static.CLIENT_TYPE) false else oldUser.driver!!.isWorking
-            if (userModel.languages?.isNotEmpty() == true){
-                try {
-                    languageService.deleteAllLanguages(userModel.id)
-                } catch (e : Exception){
-                    e.printStackTrace()
-                    println("no languages")
-                }
-            }
+            userModel.languages = updateLanguages(userModel.languages!!, oldUser.languages!!, userModel)
 
-            val savedLanguages = arrayListOf<SpeakingLanguagesModel>()
-            if (oldUser.languages?.isNotEmpty() == true) {
-
-                oldUser.languages?.forEach { l ->
-                    var found = false
-
-                    savedLanguages.forEach {
-                        if (it.language == l.language) found = true
-                    }
-                    if (!found) {
-                        savedLanguages.add(saveLanguage(l.language, userModel))
-                    }
-                    found = false
-                }
-
-            } else {
-                saveLanguage(userModel = userModel)
-            }
             return changeFilesToResp(userRepository.save(userModel))
         } else return UserModel()
+    }
+
+    private fun updateLanguages(oldLanguagesList : List<SpeakingLanguagesModel>,
+                                newLanguagesList : List<SpeakingLanguagesModel>,
+                                user : UserModel) : List<SpeakingLanguagesModel>{
+        //создаём список с языками
+        val l = arrayListOf<String>()
+        oldLanguagesList.forEach { l.add(it.language) }
+        newLanguagesList.forEach { l.add(it.language) }
+        val languages = l.stream().distinct().collect(Collectors.toList())
+        val returnList = arrayListOf<SpeakingLanguagesModel>()
+        languages.forEach {
+            returnList.add(saveLanguage(it, user))
+        }
+        return returnList
     }
 
     private fun changeFilesToResp(newUser: UserModel) : UserModel {
