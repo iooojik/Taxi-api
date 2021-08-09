@@ -15,6 +15,6 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
         registry.setApplicationDestinationPrefixes("/requests")
-        registry.enableSimpleBroker("/topic")
+        registry.enableSimpleBroker("/topic").setHeartbeatValue(longArrayOf(3000L, 3000L))
     }
 }

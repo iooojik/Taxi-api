@@ -1,4 +1,4 @@
-package octii.dev.taxi.contollers
+package octii.dev.taxi.contollers.rest
 
 import octii.dev.taxi.ResponseGenerator
 import octii.dev.taxi.services.TaximeterService
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/taximeter/")
 class TaximeterController(val taximeterService: TaximeterService) : ResponseGenerator {
 
-    @GetMapping("/")
-    fun getAll() : ResponseEntity<Any> = okResponse(taximeterService.getAll())
+    //@GetMapping("/")
+    //fun getAll() : ResponseEntity<Any> = okResponse(taximeterService.getAll())
 
 }

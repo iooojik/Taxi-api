@@ -1,4 +1,4 @@
-package octii.dev.taxi.contollers
+package octii.dev.taxi.contollers.rest
 
 import octii.dev.taxi.ResponseGenerator
 import octii.dev.taxi.constants.Static

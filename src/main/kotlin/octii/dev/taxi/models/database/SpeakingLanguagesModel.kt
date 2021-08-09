@@ -1,6 +1,7 @@
 package octii.dev.taxi.models.database
 
 import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -9,6 +10,7 @@ class SpeakingLanguagesModel(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "_id")
+    @JsonIgnore
     var id: Long = -1,
     @Column(name = "language")
     var language : String = "sr",

@@ -31,13 +31,14 @@ class UserService(val userRepository: UserRepository,
         user.languages = null
         if (user.type == Static.DRIVER_TYPE) user.isOnlyClient = false
         var savedUser = userRepository.save(user)
-
         savedUser.coordinates = coordinatesRepository.save(CoordinatesModel(user = savedUser))
+        println(savedUser.coordinates)
         savedUser.languages = listOf(languageRepository.save(SpeakingLanguagesModel(user = savedUser)))
         savedUser.driver = driverRepository.save(DriverModel(driver = savedUser))
         savedUser.driver!!.prices = pricesService.save(Prices(driver = savedUser.driver))
         savedUser.token = UUID.randomUUID().toString()
         savedUser.uuid = UUID.randomUUID().toString()
+        savedUser.lastLogin = Date().toString()
         //обновляем данные пользователя
         savedUser = userRepository.save(savedUser)
         return savedUser
@@ -46,6 +47,7 @@ class UserService(val userRepository: UserRepository,
     fun login(user: UserModel): AuthorizationModel {
         //находим пользователя по номеру телефона или находим по UUID
         var foundUser = userRepository.findByPhone(user.phone) ?: userRepository.findByUuid(user.uuid)
+        println(user.coordinates)
         return if (foundUser != null) {
             if (user.userName.trim().isNotEmpty())
                 foundUser.userName = user.userName
@@ -53,6 +55,7 @@ class UserService(val userRepository: UserRepository,
             foundUser.isWhatsapp = user.isWhatsapp
             foundUser.isViber = user.isViber
             foundUser.token = UUID.randomUUID().toString().replace("-", "")
+            foundUser.lastLogin = Date().toString()
 
             foundUser = userRepository.save(foundUser)
             AuthorizationModel(changeFilesToResp(foundUser), getLastOrder(foundUser))
@@ -67,6 +70,7 @@ class UserService(val userRepository: UserRepository,
         var foundUser = userRepository.findByToken(user.token)
         return if (foundUser != null){
             foundUser.token = UUID.randomUUID().toString()
+            foundUser.lastLogin = Date().toString()
             foundUser = userRepository.save(foundUser)
             val lastOrder = getLastOrder(foundUser)
             AuthorizationModel(changeFilesToResp(foundUser), if (lastOrder.isFinished) null else lastOrder)
@@ -99,8 +103,15 @@ class UserService(val userRepository: UserRepository,
                 if (oldUser.driver?.prices?.priceWaitingMin != null) oldUser.driver?.prices?.priceWaitingMin!! else 1f
 
             userModel.driver!!.isWorking = if (userModel.type == Static.CLIENT_TYPE) false else oldUser.driver!!.isWorking
+            if (userModel.languages?.isNotEmpty() == true){
+                try {
+                    languageService.deleteAllLanguages(userModel.id)
+                } catch (e : Exception){
+                    e.printStackTrace()
+                    println("no languages")
+                }
+            }
 
-            languageService.deleteAllLanguages(userModel.id)
             val savedLanguages = arrayListOf<SpeakingLanguagesModel>()
             if (oldUser.languages?.isNotEmpty() == true) {
 

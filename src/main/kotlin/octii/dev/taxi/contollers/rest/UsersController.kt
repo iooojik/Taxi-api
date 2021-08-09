@@ -1,4 +1,4 @@
-package octii.dev.taxi.contollers
+package octii.dev.taxi.contollers.rest
 
 import octii.dev.taxi.ResponseGenerator
 import octii.dev.taxi.constants.StaticMessages
@@ -18,8 +18,8 @@ class UsersController(private val userService: UserService,
                       private val ordersService: OrdersService,
                       private val languageService: LanguageService) : ResponseGenerator {
 
-    @GetMapping("/")
-    fun getUsers() : ResponseEntity<Any> = okResponse(userService.getAllUsers())
+    //@GetMapping("/")
+    //fun getUsers() : ResponseEntity<Any> = okResponse(userService.getAllUsers())
 
     @PostMapping("/login.token")
     fun loginWithToken(@RequestBody user : UserModel) : ResponseEntity<Any>{

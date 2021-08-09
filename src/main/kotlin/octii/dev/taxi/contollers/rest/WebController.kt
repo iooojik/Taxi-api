@@ -1,4 +1,4 @@
-package octii.dev.taxi.contollers
+package octii.dev.taxi.contollers.rest
 
 import octii.dev.taxi.ResponseGenerator
 import org.springframework.stereotype.Controller

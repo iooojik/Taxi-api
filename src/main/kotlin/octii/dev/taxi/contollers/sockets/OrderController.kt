@@ -1,9 +1,8 @@
-package octii.dev.taxi.contollers
+package octii.dev.taxi.contollers.sockets
 
 import octii.dev.taxi.listeners.WebSocketEventListener
-import octii.dev.taxi.models.MessageType
-import octii.dev.taxi.models.ResponseModel
-import octii.dev.taxi.models.TaximeterUpdate
+import octii.dev.taxi.constants.MessageType
+import octii.dev.taxi.models.sockets.OrdersResponseModel
 import octii.dev.taxi.models.database.*
 import octii.dev.taxi.services.*
 import org.springframework.messaging.handler.annotation.DestinationVariable
@@ -15,10 +14,10 @@ import java.util.*
 
 
 @Controller
-class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
-                       val userService: UserService, val driverService: DriverService,
-                       val ordersService: OrdersService, val rejectedOrdersService: RejectedOrdersService,
-                       val coordinateService: CoordinateService, val taximeterService: TaximeterService) {
+class OrderController(val simpMessagingTemplate : SimpMessagingTemplate,
+                      val userService: UserService, val driverService: DriverService,
+                      val ordersService: OrdersService, val rejectedOrdersService: RejectedOrdersService,
+                      val coordinateService: CoordinateService, val taximeterService: TaximeterService) {
 
     val logger = WebSocketEventListener.logger
 
@@ -58,22 +57,22 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
                     println("uuid: ${foundDriver.driver!!.uuid}")
                     simpMessagingTemplate.convertAndSend(
                         "/topic/${foundDriver.driver!!.uuid}",
-                        ResponseModel(MessageType.ORDER_REQUEST, order = order)
+                        OrdersResponseModel(MessageType.ORDER_REQUEST, order = order)
                     )
                     logger.info("order: $order")
                 } else {
                     simpMessagingTemplate.convertAndSend(
-                        "/topic/${customer.uuid}", ResponseModel(MessageType.NO_ORDERS, order = order)
+                        "/topic/${customer.uuid}", OrdersResponseModel(MessageType.NO_ORDERS, order = order)
                     )
                 }
             } else {
                 simpMessagingTemplate.convertAndSend(
-                    "/topic/${customerUUID}", ResponseModel(MessageType.NO_ORDERS, order = orderModel)
+                    "/topic/${customerUUID}", OrdersResponseModel(MessageType.NO_ORDERS, order = orderModel)
                 )
             }
         } else {
             simpMessagingTemplate.convertAndSend(
-                "/topic/${customerUUID}", ResponseModel(MessageType.NO_ORDERS, order = orderModel)
+                "/topic/${customerUUID}", OrdersResponseModel(MessageType.NO_ORDERS, order = orderModel)
             )
         }
     }
@@ -94,12 +93,12 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
 
             simpMessagingTemplate.convertAndSend(
                 "/topic/${order.driver!!.uuid}",
-                ResponseModel(MessageType.ORDER_ACCEPT, order = order)
+                OrdersResponseModel(MessageType.ORDER_ACCEPT, order = order)
             )
 
             simpMessagingTemplate.convertAndSend(
                 "/topic/${order.customer!!.uuid}",
-                ResponseModel(MessageType.ORDER_ACCEPT, order = order)
+                OrdersResponseModel(MessageType.ORDER_ACCEPT, order = order)
             )
             println("sent")
         }
@@ -127,11 +126,11 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
             
             simpMessagingTemplate.convertAndSend(
                 "/topic/${orderModel.driver!!.uuid}",
-                ResponseModel(MessageType.ORDER_FINISHED, order = order)
+                OrdersResponseModel(MessageType.ORDER_FINISHED, order = order)
             )
             simpMessagingTemplate.convertAndSend(
                 "/topic/${orderModel.customer!!.uuid}",
-                ResponseModel(MessageType.ORDER_FINISHED, order = order)
+                OrdersResponseModel(MessageType.ORDER_FINISHED, order = order)
             )
         }
     }
@@ -146,33 +145,8 @@ class SocketController(val simpMessagingTemplate : SimpMessagingTemplate,
         /*
         simpMessagingTemplate.convertAndSend(
             "/topic/$userUUID",
-            ResponseModel(MessageType.COORDINATES_UPDATE, coordinates)
+            OrdersResponseModel(MessageType.COORDINATES_UPDATE, coordinates)
         )*/
-    }
-
-    @MessageMapping("/taximeter.update.{uuid}")
-    fun taximeterUpdate(@Payload taximeterUpdate: TaximeterUpdate, @DestinationVariable("uuid") userUUID: String){
-        simpMessagingTemplate.convertAndSend(
-            "/topic/${taximeterUpdate.recipientUUID}/taximeter",
-            ResponseModel(MessageType.TAXIMETER_UPDATE, coordinates = taximeterUpdate.coordinates)
-        )
-        /*
-        if (taximeterModel.action.trim().isNotEmpty()){
-            taximeterService.save(taximeterModel)
-        }
-        val user = userService.getByUserUUID(userUUID)
-        if (user != null) {
-            val type = user.type
-            val recipientUser =
-                if (type == Static.DRIVER_TYPE) taximeterModel.orderModel.customer
-                else taximeterModel.orderModel.customer
-
-            simpMessagingTemplate.convertAndSend(
-                "/topic/${recipientUser!!.uuid}/taximeter",
-                ResponseModel(MessageType.TAXIMETER_UPDATE, taximeterModel = taximeterModel)
-            )
-        }
-         */
     }
 
     private fun getNearestDriver(customer : UserModel, orderUUID: String) : DriverModel? {

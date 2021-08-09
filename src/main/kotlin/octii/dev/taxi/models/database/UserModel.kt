@@ -1,5 +1,6 @@
 package octii.dev.taxi.models.database
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
 import javax.persistence.*
 
@@ -28,6 +29,9 @@ data class UserModel(
     var isOnlyClient : Boolean = type == "client",
     @Column(name = "avatar_url")
     var avatarURL : String? = "",
+    @Column(name = "last_login")
+    @JsonIgnore
+    var lastLogin : String? = Date().toString(),
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var languages : List<SpeakingLanguagesModel>? = listOf(),
     @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])

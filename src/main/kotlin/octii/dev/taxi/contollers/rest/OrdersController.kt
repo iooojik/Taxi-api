@@ -1,4 +1,4 @@
-package octii.dev.taxi.contollers
+package octii.dev.taxi.contollers.rest
 
 import octii.dev.taxi.ResponseGenerator
 import octii.dev.taxi.models.database.OrdersModel
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/orders/")
 class OrdersController(private val ordersService: OrdersService) : ResponseGenerator {
 
-    @GetMapping("/")
-    fun getOrders() : ResponseEntity<Any> = okResponse(ordersService.getAll())
+    //@GetMapping("/")
+    //fun getOrders() : ResponseEntity<Any> = okResponse(ordersService.getAll())
 
     @GetMapping("/completed")
     fun getCompletedOrders() : ResponseEntity<Any> = okResponse(ordersService.getAllCompleted())
@@ -28,7 +28,7 @@ class OrdersController(private val ordersService: OrdersService) : ResponseGener
         else{
             var order = ordersService.getOrderByDriverID(userModel.id)
             if (order.id < 1) order = ordersService.getOrderByCustomerID(userModel.id)
-            if (order.driverID != null)
+            if (order.driverID != null || order.driverID!! > 0)
                 okResponse(order)
             else okResponse(OrdersModel())
         }
