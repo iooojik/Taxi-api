@@ -59,6 +59,7 @@ class OrderController(val simpMessagingTemplate : SimpMessagingTemplate,
                         "/topic/${foundDriver.driver!!.uuid}",
                         OrdersResponseModel(MessageType.ORDER_REQUEST, order = order)
                     )
+                    Timer().scheduleAtFixedRate(OrderTime(order), 0, 5000)
                     logger.info("order: $order")
                 } else {
                     simpMessagingTemplate.convertAndSend(
@@ -81,15 +82,13 @@ class OrderController(val simpMessagingTemplate : SimpMessagingTemplate,
     fun acceptOrder(@Payload orderModel: OrdersModel, @DestinationVariable("uuid") driverUUID : String){
         println("order accepted")
         val order = ordersService.getByOrderUUID(orderModel.uuid)
-        println(driverUUID)
         if (order != null) {
             val driver = userService.getByUserUUID(driverUUID)
 
             order.driverID = driver?.id
             order.driver = driver!!
+            order.isAccepted = true
             ordersService.update(order)
-            println(order.driver)
-            println(order.customer)
 
             simpMessagingTemplate.convertAndSend(
                 "/topic/${order.driver!!.uuid}",
@@ -100,7 +99,6 @@ class OrderController(val simpMessagingTemplate : SimpMessagingTemplate,
                 "/topic/${order.customer!!.uuid}",
                 OrdersResponseModel(MessageType.ORDER_ACCEPT, order = order)
             )
-            println("sent")
         }
     }
 
@@ -218,6 +216,21 @@ class OrderController(val simpMessagingTemplate : SimpMessagingTemplate,
     /* The function to convert radians into decimal */
     private fun rad2deg(rad: Double): Double {
         return rad * 180.0 / Math.PI
+    }
+
+    inner class OrderTime(private val orderModel: OrdersModel) : TimerTask() {
+
+        private var seconds = 20
+
+        override fun run() {
+            val mOrder = ordersService.getByOrderUUID(orderModel.uuid)
+            if (seconds - 1 < 0){
+                if (mOrder?.isAccepted == true) seconds = 0
+                else rejectOrder(orderModel, orderModel.driver!!.uuid)
+                this.cancel()
+            }
+            seconds-=5
+        }
     }
 
 }

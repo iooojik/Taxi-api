@@ -24,16 +24,18 @@ class UserService(val userRepository: UserRepository,
     fun getAllUsers(): List<UserModel> = userRepository.findAll()
 
     fun registerUser(user : UserModel) : UserModel {
-
         //сохраняем пользователя и получаем его стандартные данные
         //сохраняем модель с координатами
+        val coords = user.coordinates
         user.coordinates = null
         user.driver = null
         user.languages = null
         if (user.type == Static.DRIVER_TYPE) user.isOnlyClient = false
         var savedUser = userRepository.save(user)
         savedUser.coordinates = coordinatesRepository.save(CoordinatesModel(user = savedUser))
-        println(savedUser.coordinates)
+        savedUser.coordinates!!.longitude = coords!!.longitude
+        savedUser.coordinates!!.latitude = coords.latitude
+        coordinatesRepository.save(savedUser.coordinates!!)
         savedUser.languages = listOf(languageRepository.save(SpeakingLanguagesModel(user = savedUser)))
         savedUser.driver = driverRepository.save(DriverModel(driver = savedUser))
         savedUser.driver!!.prices = pricesService.save(Prices(driver = savedUser.driver))
@@ -42,13 +44,13 @@ class UserService(val userRepository: UserRepository,
         savedUser.lastLogin = Date().toString()
         //обновляем данные пользователя
         savedUser = userRepository.save(savedUser)
+        println(savedUser)
         return savedUser
     }
 
     fun login(user: UserModel): AuthorizationModel {
         //находим пользователя по номеру телефона или находим по UUID
         var foundUser = userRepository.findByPhone(user.phone) ?: userRepository.findByUuid(user.uuid)
-        println(user.coordinates)
         return if (foundUser != null) {
             if (user.userName.trim().isNotEmpty())
                 foundUser.userName = user.userName
