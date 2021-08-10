@@ -28,8 +28,10 @@ class OrdersController(private val ordersService: OrdersService) : ResponseGener
         else{
             var order = ordersService.getOrderByDriverID(userModel.id)
             if (order.id < 1) order = ordersService.getOrderByCustomerID(userModel.id)
-            if (order.driverID != null || order.driverID!! > 0)
-                okResponse(order)
+            if (order.driverID != null)
+                if(order.driverID!! > 0)
+                    okResponse(order)
+                else errorResponse()
             else okResponse(OrdersModel())
         }
     }
