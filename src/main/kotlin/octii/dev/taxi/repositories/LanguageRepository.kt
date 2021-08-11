@@ -8,8 +8,5 @@ import org.springframework.transaction.annotation.Transactional
 
 @Repository
 interface LanguageRepository : JpaRepository<SpeakingLanguagesModel, Long>{
-    @Transactional
-    fun deleteAllByUserId(id : Long)
-
-    fun deleteAllByUser(user : UserModel)
+    fun deleteByUser_Id(id : Long)
 }

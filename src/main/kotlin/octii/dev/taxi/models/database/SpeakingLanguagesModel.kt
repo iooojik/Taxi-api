@@ -15,10 +15,10 @@ class SpeakingLanguagesModel(
     @Column(name = "language")
     var language : String = "sr",
     @Column(name = "user_id", insertable = false, updatable = false)
-    var userId : Long = -1,
+    var userId : Long? = -1,
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonIgnore
     var user : UserModel? = null
 ) {
     override fun toString(): String {

@@ -36,7 +36,7 @@ class UserService(val userRepository: UserRepository,
         savedUser.coordinates!!.longitude = coords!!.longitude
         savedUser.coordinates!!.latitude = coords.latitude
         coordinatesRepository.save(savedUser.coordinates!!)
-        savedUser.languages = listOf(languageRepository.save(SpeakingLanguagesModel(user = savedUser)))
+        savedUser.languages = listOf(saveLanguage(userModel = savedUser))
         savedUser.driver = driverRepository.save(DriverModel(driver = savedUser))
         savedUser.driver!!.prices = pricesService.save(Prices(driver = savedUser.driver))
         savedUser.token = UUID.randomUUID().toString()
@@ -91,7 +91,7 @@ class UserService(val userRepository: UserRepository,
     fun getByUserUUID(uuid : String) : UserModel? = userRepository.findByUuid(uuid)
 
     fun update(oldUser : UserModel) : UserModel {
-        val userModel = getByUserUUID(oldUser.uuid)
+        var userModel = getByUserUUID(oldUser.uuid)
         if (userModel != null) {
             userModel.isViber = oldUser.isViber
             userModel.isWhatsapp = oldUser.isWhatsapp
@@ -107,8 +107,8 @@ class UserService(val userRepository: UserRepository,
 
             userModel.driver!!.isWorking = if (userModel.type == Static.CLIENT_TYPE) false else oldUser.driver!!.isWorking
             userModel.languages = updateLanguages(userModel.languages!!, oldUser.languages!!, userModel)
-
-            return changeFilesToResp(userRepository.save(userModel))
+            userModel = userRepository.save(userModel)
+            return changeFilesToResp(userModel)
         } else return UserModel()
     }
 
@@ -117,7 +117,6 @@ class UserService(val userRepository: UserRepository,
                                 user : UserModel) : List<SpeakingLanguagesModel>{
         //создаём список с языками
         val l = arrayListOf<String>()
-        oldLanguagesList.forEach { l.add(it.language) }
         newLanguagesList.forEach { l.add(it.language) }
         val languages = l.stream().distinct().collect(Collectors.toList())
         val returnList = arrayListOf<SpeakingLanguagesModel>()

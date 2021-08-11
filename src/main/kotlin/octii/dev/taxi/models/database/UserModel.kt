@@ -32,7 +32,7 @@ data class UserModel(
     @Column(name = "last_login")
     @JsonIgnore
     var lastLogin : String? = Date().toString(),
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = [CascadeType.PERSIST])
     var languages : List<SpeakingLanguagesModel>? = listOf(),
     @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
     var coordinates : CoordinatesModel? = null,
