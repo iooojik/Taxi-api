@@ -90,6 +90,14 @@ class UserService(val userRepository: UserRepository,
 
     fun getByUserUUID(uuid : String) : UserModel? = userRepository.findByUuid(uuid)
 
+    fun updateDriverState(oldUser : UserModel) : UserModel{
+        val userModel = getByUserUUID(oldUser.uuid)
+        return if (userModel != null){
+            userModel.driver?.isWorking = oldUser.driver?.isWorking!!
+            userRepository.save(userModel)
+        } else UserModel()
+    }
+
     fun update(oldUser : UserModel) : UserModel {
         var userModel = getByUserUUID(oldUser.uuid)
         if (userModel != null) {

@@ -47,4 +47,13 @@ class UsersController(private val userService: UserService,
             okResponse(userService.update(user))
         } else errorResponse()
     }
+
+    @PostMapping("/update.driver.state")
+    fun updateDriverState(@RequestBody user : UserModel) : ResponseEntity<Any>{
+        return if (user.uuid.trim().isNotEmpty()){
+            val u = userService.updateDriverState(user)
+            if (u.id > 0) okResponse("")
+            else errorResponse()
+        } else errorResponse()
+    }
 }
