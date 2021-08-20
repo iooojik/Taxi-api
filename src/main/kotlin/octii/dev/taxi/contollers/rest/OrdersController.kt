@@ -15,13 +15,13 @@ class OrdersController(private val ordersService: OrdersService) : ResponseGener
 
     //@GetMapping("/")
     //fun getOrders() : ResponseEntity<Any> = okResponse(ordersService.getAll())
-
+/*
     @GetMapping("/completed")
     fun getCompletedOrders() : ResponseEntity<Any> = okResponse(ordersService.getAllCompleted())
 
     @GetMapping("/not.completed")
     fun getNotCompletedOrders() : ResponseEntity<Any> = okResponse(ordersService.getAllNotCompleted())
-
+*/
     @PostMapping("/check")
     fun ordersCheck(@RequestBody userModel: UserModel) : ResponseEntity<Any> {
         return if (userModel.id < 0) errorResponse()
@@ -29,7 +29,7 @@ class OrdersController(private val ordersService: OrdersService) : ResponseGener
             var order = ordersService.getOrderByDriverID(userModel.id)
             if (order.id < 1) order = ordersService.getOrderByCustomerID(userModel.id)
             if (order.driverID != null)
-                if(order.driverID!! > 0)
+                if(order.driverID!! > 0 && order.isAccepted!!)
                     okResponse(order)
                 else errorResponse()
             else okResponse(OrdersModel())
