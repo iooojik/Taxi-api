@@ -1,8 +1,6 @@
 package octii.dev.taxi.models.database
 
-import com.fasterxml.jackson.annotation.JsonBackReference
 import octii.dev.taxi.constants.TaximeterStatus
-import octii.dev.taxi.models.Prices
 import java.util.*
 import javax.persistence.*
 

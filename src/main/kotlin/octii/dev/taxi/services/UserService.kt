@@ -8,6 +8,7 @@ import octii.dev.taxi.repositories.CoordinatesRepository
 import octii.dev.taxi.repositories.DriverRepository
 import octii.dev.taxi.repositories.LanguageRepository
 import octii.dev.taxi.repositories.UserRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.stream.Collectors
@@ -22,6 +23,8 @@ class UserService(val userRepository: UserRepository,
                   val usersToFilesService: UsersToFilesService, val pricesService: PricesService) {
 
     fun getAllUsers(): List<UserModel> = userRepository.findAll()
+    
+    fun getById(id : Long) : UserModel? = userRepository.findByIdOrNull(id)
 
     fun registerUser(user : UserModel) : UserModel {
         //сохраняем пользователя и получаем его стандартные данные

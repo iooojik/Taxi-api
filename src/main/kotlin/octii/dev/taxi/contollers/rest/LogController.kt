@@ -1,21 +1,16 @@
 package octii.dev.taxi.contollers.rest
 
 import octii.dev.taxi.ResponseGenerator
-import octii.dev.taxi.constants.Static
 import octii.dev.taxi.models.database.LogModel
-import octii.dev.taxi.models.database.UsersToFiles
 import octii.dev.taxi.services.LogService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
-import org.springframework.util.DigestUtils
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
-import java.util.*
 
 @Controller
 @RestController

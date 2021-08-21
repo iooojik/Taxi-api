@@ -1,6 +1,5 @@
 package octii.dev.taxi.models.database
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.Hibernate
 import java.util.*
 import javax.persistence.*
@@ -21,10 +20,8 @@ data class OrdersModel(
     @Column(name = "is_finished")
     var isFinished : Boolean = false,
     @Column(name = "is_accepted")
-    @JsonIgnore
     var isAccepted : Boolean? = false,
     @Column(name = "date_created")
-    @JsonIgnore
     var dateCreated : String? = Date().toString(),
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "driver_id", referencedColumnName = "_id")
