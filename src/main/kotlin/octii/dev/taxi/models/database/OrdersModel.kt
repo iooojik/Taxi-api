@@ -21,6 +21,8 @@ data class OrdersModel(
     var isFinished : Boolean = false,
     @Column(name = "is_accepted")
     var isAccepted : Boolean? = false,
+    @Column(name = "deal_price")
+    var dealPrice : Float? = 0f,
     @Column(name = "date_created")
     var dateCreated : String? = Date().toString(),
     @ManyToOne(cascade = [CascadeType.ALL])

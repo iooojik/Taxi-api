@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class OrdersService(val ordersRepository: OrdersRepository) {
+    
+    fun save(orderModel: OrdersModel) : OrdersModel = ordersRepository.save(orderModel)
 
     fun registerNewOrder(orderModel : OrdersModel) : OrdersModel {
         return ordersRepository.save(orderModel)

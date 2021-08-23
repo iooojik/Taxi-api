@@ -19,6 +19,12 @@ class WebController : ResponseGenerator {
 
     @GetMapping("/")
     fun index() : String = "index"
+    
+    @GetMapping("/privacy*")
+    fun privacy() : String = "privacy"
+    
+    @GetMapping("/terms*")
+    fun terms() : String = "terms"
 
     @GetMapping("/images/*/*")
     @ResponseBody

@@ -2,7 +2,6 @@ package octii.dev.taxi.contollers.sockets
 
 import octii.dev.taxi.constants.TaximeterStatus
 import octii.dev.taxi.constants.TaximeterType
-import octii.dev.taxi.listeners.WebSocketEventListener
 import octii.dev.taxi.models.TaximeterUpdate
 import octii.dev.taxi.models.database.TaximeterModel
 import octii.dev.taxi.models.sockets.TaximeterResponseModel
@@ -16,9 +15,7 @@ import java.util.*
 
 @Controller
 class TaximeterSocksController(val simpMessagingTemplate : SimpMessagingTemplate, val taximeterService: TaximeterService) {
-
-    val logger = WebSocketEventListener.logger
-
+    
     @MessageMapping("/taximeter.start.{uuid}")
     fun taximeterStart(@Payload taximeterUpdate: TaximeterUpdate, @DestinationVariable("uuid") userUUID: String){
         taximeterService.save(TaximeterModel(
