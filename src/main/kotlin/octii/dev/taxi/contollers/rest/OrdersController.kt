@@ -1,6 +1,6 @@
 package octii.dev.taxi.contollers.rest
 
-import octii.dev.taxi.ResponseGenerator
+import octii.dev.taxi.custom.ResponseGenerator
 import octii.dev.taxi.models.database.OrdersModel
 import octii.dev.taxi.models.database.UserModel
 import octii.dev.taxi.services.OrdersService

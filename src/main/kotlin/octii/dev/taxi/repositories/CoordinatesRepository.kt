@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CoordinatesRepository : JpaRepository<CoordinatesModel, Long> {
-
-    fun findByUserId(id : Long) : CoordinatesModel?
-
+	
+	fun findByUserId(id: Long): CoordinatesModel?
+	
 }

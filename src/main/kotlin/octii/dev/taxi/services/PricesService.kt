@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service
 
 @Service
 class PricesService(val pricesRepository: PricesRepository) {
-    fun save(prices: Prices) : Prices = pricesRepository.save(prices)
+	fun save(prices: Prices): Prices = pricesRepository.save(prices)
 }

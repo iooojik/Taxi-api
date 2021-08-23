@@ -6,12 +6,15 @@ import octii.dev.taxi.repositories.RejectedOrdersRepository
 import org.springframework.stereotype.Service
 
 @Service
-class RejectedOrdersService(val ordersRepository: OrdersRepository,
-                            val rejectedOrdersRepository: RejectedOrdersRepository) {
-
-    fun getAll() : List<RejectedOrdersModel> = rejectedOrdersRepository.findAll()
-
-    fun getByOrderUUID(uuid : String) : List<RejectedOrdersModel> = rejectedOrdersRepository.findAllByOrderUuid(uuid)
-
-    fun reject(rejectedOrderModel: RejectedOrdersModel) : RejectedOrdersModel = rejectedOrdersRepository.save(rejectedOrderModel)
+class RejectedOrdersService(
+	val ordersRepository: OrdersRepository,
+	val rejectedOrdersRepository: RejectedOrdersRepository
+) {
+	
+	fun getAll(): List<RejectedOrdersModel> = rejectedOrdersRepository.findAll()
+	
+	fun getByOrderUUID(uuid: String): List<RejectedOrdersModel> = rejectedOrdersRepository.findAllByOrderUuid(uuid)
+	
+	fun reject(rejectedOrderModel: RejectedOrdersModel): RejectedOrdersModel =
+		rejectedOrdersRepository.save(rejectedOrderModel)
 }

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service
 
 @Service
 class LogService(private val logRepository: LogRepository) {
-	fun save(logModel: LogModel) : LogModel = logRepository.save(logModel)
+	fun save(logModel: LogModel): LogModel = logRepository.save(logModel)
 }

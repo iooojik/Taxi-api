@@ -7,8 +7,9 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LanguageService(private val languageRepository: LanguageRepository) {
-    @Transactional
-    fun delete(lang : SpeakingLanguagesModel) = languageRepository.delete(lang)
-    @Transactional
-    fun save(lang : SpeakingLanguagesModel) : SpeakingLanguagesModel = languageRepository.save(lang)
+	@Transactional
+	fun delete(lang: SpeakingLanguagesModel) = languageRepository.delete(lang)
+	
+	@Transactional
+	fun save(lang: SpeakingLanguagesModel): SpeakingLanguagesModel = languageRepository.save(lang)
 }

@@ -12,22 +12,22 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent
 
 @Component
 class WebSocketEventListener(val messagingTemplate: SimpMessageSendingOperations) {
-    companion object {
-        val logger: Logger = LoggerFactory.logger(WebSocketEventListener::class.java)
-    }
-
-    @EventListener
-    fun handleWebSocketConnectListener(event: SessionConnectedEvent?) {
-        logger.info("Received a new web socket connection ${event.toString()}")
-    }
-
-    @EventListener
-    fun handleWebSocketDisconnectListener(event: SessionDisconnectEvent) {
-        val headerAccessor = StompHeaderAccessor.wrap(event.message)
-        val username = headerAccessor.sessionAttributes!!["username"] as String?
-        if (username != null) {
-            logger.info("User Disconnected : $username")
-            messagingTemplate.convertAndSend("/topic/public", event)
-        }
-    }
+	companion object {
+		val logger: Logger = LoggerFactory.logger(WebSocketEventListener::class.java)
+	}
+	
+	@EventListener
+	fun handleWebSocketConnectListener(event: SessionConnectedEvent?) {
+		logger.info("Received a new web socket connection ${event.toString()}")
+	}
+	
+	@EventListener
+	fun handleWebSocketDisconnectListener(event: SessionDisconnectEvent) {
+		val headerAccessor = StompHeaderAccessor.wrap(event.message)
+		val username = headerAccessor.sessionAttributes!!["username"] as String?
+		if (username != null) {
+			logger.info("User Disconnected : $username")
+			messagingTemplate.convertAndSend("/topic/public", event)
+		}
+	}
 }

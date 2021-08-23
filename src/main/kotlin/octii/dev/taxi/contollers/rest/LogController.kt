@@ -1,6 +1,7 @@
 package octii.dev.taxi.contollers.rest
 
-import octii.dev.taxi.ResponseGenerator
+import octii.dev.taxi.constants.StaticMessages
+import octii.dev.taxi.custom.ResponseGenerator
 import octii.dev.taxi.models.database.LogModel
 import octii.dev.taxi.services.LogService
 import org.springframework.http.ResponseEntity
@@ -18,13 +19,15 @@ import java.time.LocalDateTime
 class LogController(private val logService: LogService) : ResponseGenerator {
 	@PostMapping("/send.log")
 	@ResponseBody
-	fun sendLog(@RequestParam file: MultipartFile, @RequestParam(name = "userUUID") userUUID : String): ResponseEntity<Any> {
+	fun sendLog(
+		@RequestParam file: MultipartFile,
+		@RequestParam(name = "userUUID") userUUID: String
+	): ResponseEntity<Any> {
 		return if (!file.isEmpty) {
 			val today = LocalDateTime.now()
 			val path = "/home/tomcat/taxi/logs/${today.year}/${today.month}/${today.dayOfMonth}/${today.hour}/"
 			val fileName = file.originalFilename!!
 			val logModel = LogModel(path = path, userUUID = userUUID)
-			//val path = "./images/${type.lowercase()}/"
 			val convertedFile = File("$path$fileName")
 			File(path).mkdirs()
 			try {
@@ -39,7 +42,7 @@ class LogController(private val logService: LogService) : ResponseGenerator {
 				errorResponse(e.toString())
 			}
 		} else {
-			errorResponse("empty file")
+			errorResponse(StaticMessages.EMPTY_FILE)
 		}
 	}
 }

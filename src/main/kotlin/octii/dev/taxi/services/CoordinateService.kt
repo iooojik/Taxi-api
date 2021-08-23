@@ -6,17 +6,17 @@ import org.springframework.stereotype.Service
 
 @Service
 class CoordinateService(private val coordinatesRepository: CoordinatesRepository) {
-    fun update(coordinatesModel: CoordinatesModel, userId : Long) : CoordinatesModel? {
-        val foundCoordinates = coordinatesRepository.findByUserId(userId)
-        return if (foundCoordinates != null){
-            foundCoordinates.latitude = coordinatesModel.latitude
-            foundCoordinates.longitude = coordinatesModel.longitude
-            coordinatesRepository.save(foundCoordinates)
-        } else{
-            //coordinatesModel.userId = userId
-            coordinatesRepository.save(coordinatesModel)
-        }
-    }
-
-    fun getByUserId(id : Long) : CoordinatesModel? = coordinatesRepository.findByUserId(id)
+	fun update(coordinatesModel: CoordinatesModel, userId: Long): CoordinatesModel? {
+		val foundCoordinates = coordinatesRepository.findByUserId(userId)
+		return if (foundCoordinates != null) {
+			foundCoordinates.latitude = coordinatesModel.latitude
+			foundCoordinates.longitude = coordinatesModel.longitude
+			coordinatesRepository.save(foundCoordinates)
+		} else {
+			//coordinatesModel.userId = userId
+			coordinatesRepository.save(coordinatesModel)
+		}
+	}
+	
+	fun getByUserId(id: Long): CoordinatesModel? = coordinatesRepository.findByUserId(id)
 }

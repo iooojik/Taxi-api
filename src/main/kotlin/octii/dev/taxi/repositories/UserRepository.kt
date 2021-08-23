@@ -8,13 +8,13 @@ import java.io.Serializable
 
 @Repository
 interface UserRepository : JpaRepository<UserModel, Long>, Serializable {
-    @Transactional
-    fun findByPhone(phone : String) : UserModel?
-
-    @Transactional
-    fun findByToken(token : String) : UserModel?
-
-    @Transactional
-    fun findByUuid(uuid : String) : UserModel?
-
+	@Transactional
+	fun findByPhone(phone: String): UserModel?
+	
+	@Transactional
+	fun findByToken(token: String): UserModel?
+	
+	@Transactional
+	fun findByUuid(uuid: String): UserModel?
+	
 }
