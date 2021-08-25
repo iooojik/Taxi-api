@@ -15,6 +15,8 @@ class DriverModel(
 	var isWorking: Boolean = false,
 	@Column(name = "ride_distance")
 	var rideDistance: Float = 15f,
+	@Column(name = "is_busy")
+	var isBusy: Boolean? = false,
 	@OneToOne(optional = false)
 	@JoinColumn(name = "user_id")
 	@JsonIgnore

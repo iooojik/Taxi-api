@@ -30,8 +30,6 @@ data class UserModel(
 	var isOnlyClient: Boolean = type == "client",
 	@Column(name = "avatar_url")
 	var avatarURL: String? = "",
-	@Column(name = "is_busy")
-	var isBusy: Boolean? = false,
 	@Column(name = "last_login")
 	@JsonIgnore
 	var lastLogin: String? = Date().toString(),
@@ -56,6 +54,6 @@ data class UserModel(
 	
 	@Override
 	override fun toString(): String {
-		return this::class.simpleName + "(id = $id , userName = $userName , phone = $phone , type = $type , token = $token , isWhatsapp = $isWhatsapp , isViber = $isViber , uuid = $uuid , isOnlyClient = $isOnlyClient , avatarURL = $avatarURL , isBusy = $isBusy , lastLogin = $lastLogin , coordinates = $coordinates , driver = $driver )"
+		return this::class.simpleName + "(id = $id , userName = $userName , phone = $phone , type = $type , token = $token , isWhatsapp = $isWhatsapp , isViber = $isViber , uuid = $uuid , isOnlyClient = $isOnlyClient , avatarURL = $avatarURL , lastLogin = $lastLogin , coordinates = $coordinates , driver = $driver )"
 	}
 }

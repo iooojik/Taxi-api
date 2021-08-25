@@ -6,11 +6,15 @@ import org.springframework.stereotype.Service
 
 @Service
 class DriverService(val driverRepository: DriverRepository) {
-	fun getAll(): List<DriverModel> = driverRepository.findAllByIsWorking()
+	fun getAll(): List<DriverModel> = driverRepository.findAllByIsWorkingAndIsBusy()
 	
 	fun getByDriverID(id: Long): DriverModel? = driverRepository.findByDriver_Id(id)
 	
 	fun save(driverModel: DriverModel): DriverModel? = driverRepository.save(driverModel)
+	
+	fun updateState(oldDriver: DriverModel) : DriverModel? {
+		return driverRepository.save(oldDriver)
+	}
 	
 	fun update(oldDriver: DriverModel, newDriver: DriverModel): DriverModel? {
 		oldDriver.isWorking = newDriver.isWorking
